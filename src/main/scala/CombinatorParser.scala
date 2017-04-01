@@ -28,5 +28,26 @@ object CombinatorParser extends JavaTokenParsers {
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
+    |ident ^^ {case s => Variable(s)} // TODO need to add Variable to ast.scala
+  )
+  /**statement ::= expression ";" | assignment | conditional | loop | block*/
+  def statement: Parser[Expr] = (
+    expr ~ ";" ^^ { case s => Variable(s)} // TODO NOT CORRECT but a good start, change case statement
+  )
+  /**assignment ::= ident "=" expression ";"*/
+  def assignment: Parser[Expr] = (
+    ident ~ "=" ~ expr ~ ";" ^^ {case s => Variable(s)} // TODO NOT CORRECT but a good start, change case statement
+  )
+  /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
+  def conditional: Parser[Expr] = (
+    "if" ~ whiteSpace ~ "(" ~ expr ~ ")" ~ block ~> (Loop(_: Expr, _: Block))
+  )
+  /**loop ::= "while" "(" expression ")" block*/
+  def loop: Parser[Expr] = (
+
+  )
+ /** block ::= "{" statement* "}"*/
+  def block: Parser[Expr] = (
+
   )
 }

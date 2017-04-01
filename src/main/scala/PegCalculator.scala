@@ -3,7 +3,8 @@ package edu.luc.cs.laufer.cs473.expressions
 import org.parboiled2.ParseError
 import scala.util.{ Failure, Success }
 
-object PegCalculator extends App {
+object
+PegCalculator extends App {
 
   def processExpr(input: String): Unit = {
     println("You entered: " + input)
