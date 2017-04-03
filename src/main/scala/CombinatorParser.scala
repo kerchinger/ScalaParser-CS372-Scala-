@@ -28,26 +28,35 @@ object CombinatorParser extends JavaTokenParsers {
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-    | ident ^^ {case s => Variable(s) } // TODO need to add Variable to ast.scala
+    | ident ^^ {case s => Variable(s) }
   )
+
   /**statement ::= expression ";" | assignment | conditional | loop | block*/
-  //def statement: Parser[Expr] = (
-    //expr ~ ";" ^^ { case s => s} // TODO NOT CORRECT but a good start, change case statement
-  //)
+  def statement: Parser[Expr] = (
+    expr ~ ";" ^^ {case s ~ _ => s}
+    | assignment
+    | conditional
+    | loop
+    | block
+  )
+
   /**assignment ::= ident "=" expression ";"*/
-  //def assignment: Parser[Expr] = (
-    //ident ~ "=" ~ expr ~ ";" ^^ {case s => Variable(s)} // TODO NOT CORRECT but a good start, change case statement
-  //)
+  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s, r) }
+
   /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
-  //def conditional: Parser[Expr] = (
-    //"if" ~ whiteSpace ~ "(" ~ expr ~ ")" ~ block ~> (Loop(_: Expr, _: Block))
-  //)
+  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
+  /*I think this might be wrong... but, idk, i tried to model it off of the example below (the example is a parser but just written differently):
+ def Cond = rule {
+    "if" ~ WhiteSpace ~ ws('(') ~ Assignment ~ ws(')') ~ (
+      (Blo ~ "else" ~ WhiteSpace ~ Blo ~> (Conditional(_: Equals, _: Block, _: Block)))
+        | (Blo ~> (Conditional(_: Equals, _: Block, Block(): Block)))
+    )
+  }
+   */
+
   /**loop ::= "while" "(" expression ")" block*/
-  //def loop: Parser[Expr] = (
+  def loop: Parser[Expr] = "while" ~ "(" ~ expr ~ ")" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b => Loop(e, b) }
 
-  //)
  /** block ::= "{" statement* "}"*/
-  //def block: Parser[Expr] = (
-
-  //)
+  def block: Parser[Expr] = "{" ~ statement ~ "}" ^^ { case _ ~ s ~ _ => Block(s) }
 }
