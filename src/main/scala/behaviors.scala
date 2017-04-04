@@ -12,7 +12,13 @@ object behaviors {
     case Times(l, r) => evaluate(l) * evaluate(r)
     case Div(l, r)   => evaluate(l) / evaluate(r)
     case Mod(l, r)   => evaluate(l) % evaluate(r)
-    case Variable(c) => evaluate(e) //TODO needs to evalute x + 2
+    case Variable(e) => {
+      val x = List(e)
+      x.foldLeft(0){
+         (z, e) =>
+         return (z)
+       }
+    }
     case Block(l) => evaluate(l)
     //case Cond(l,r,x) =>
     //case Loop(l,r) =>
