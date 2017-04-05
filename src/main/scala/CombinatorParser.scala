@@ -28,7 +28,7 @@ object CombinatorParser extends JavaTokenParsers {
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-    | ident ^^ {case s => Variable(s) }
+    | ident ^^ {case s => Variable(s) }//TODO get "scala.MatchError: Variable(y)" when running this
   )
 
   /**statement ::= expression ";" | assignment | conditional | loop | block*/
@@ -41,11 +41,11 @@ object CombinatorParser extends JavaTokenParsers {
   )
 
   /**assignment ::= ident "=" expression ";"*/
-  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s, r) }
+  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s, r) } // TODO THIS ALSO DOESN'T WORK
 
   /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
   //def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
-  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ opt(block | "else" ~ block) ^^ {
+  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ opt(block | "else" ~ block) ^^ { //TODO DOES NOT WORK
     case l ~ Some("if" ~ "(" ~ e ~ ")" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
     case l ~ Some("if" ~ "(" ~ e ~ ")" ~ "else" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
   }
@@ -59,8 +59,9 @@ object CombinatorParser extends JavaTokenParsers {
    */
 
   /**loop ::= "while" "(" expression ")" block*/
-  def loop: Parser[Expr] = "while" ~ "(" ~ expr ~ ")" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b => Loop(e, b) }
+  def loop: Parser[Expr] = "while" ~ "(" ~ expr ~ ")" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK
 
  /** block ::= "{" statement* "}"*/
-  def block: Parser[Expr] = "{" ~ statement ~ "}" ^^ { case _ ~ s ~ _ => Block(s) }
+  def block: Parser[Expr] = "{" ~ statement ~ "}" ^^ { case _ ~ s ~ _ => Block(s) } // TODO THIS IS NEEDS TO BE CHANGED
+
 }

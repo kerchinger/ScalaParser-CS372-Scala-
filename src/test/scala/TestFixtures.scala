@@ -39,42 +39,37 @@ object TestFixtures {
       ),
       Constant(5)
     );
-  /*def store() = Map[String, Cell](
-    "x" -> Cell(2),
-    "y" -> Cell(3),
-    "r" -> Cell(0)
-  )*/
 
-  val complex1string3 = "{ r += x ; y -= 1 }"
+  val complex1string3 = "{ r = 5+2 ; y = 5-1 }"
   val complex3 =
     Block(
-      Assign("r", Plus(Variable("r"), Variable("x"))),
-      Assign("y", Minus(Variable("y"), Constant(1)))
+      Assign("r", Plus(Constant(5), Variable("x"))),
+      Assign("y", Minus(Constant(5), Constant(1)))
     );
 
-  val complex1string4 = "if (4) { r += x } else { y -= 1 }"
+  val complex1string4 = "if (4) { r = 5+2  } else { y = 5-1 }"
   val complex4 =
     Cond(
       Constant(4),
-      Assign("r", Plus(Variable("r"), Variable("x"))),
-      Assign("y", Minus(Variable("y"), Constant(1)))
+      Assign("r", Plus(Constant(5), Variable("x"))),
+      Assign("y", Minus(Constant(5), Constant(1)))
     );
 
-  val complex1string5 = "if (0) { r += x } else { y -= 1 }"
+  val complex1string5 = "if (0) { r = 5+2 } else { y = 5-1 }"
   val complex5 =
     Cond(
       Constant(0),
-      Assign("r", Plus(Variable("r"), Variable("x"))),
-      Assign("y", Minus(Variable("y"), Constant(1)))
+      Assign("r", Plus(Constant(5), Variable("x"))),
+      Assign("y", Minus(Constant(5), Constant(1)))
     );
 
-  val complex1string6 = "while (y) { r += x ; y -= 1 }"
+  val complex1string6 = "while (y) { r = 5+2 ; y = 5-1 }"
   val complex6 =
     Loop(
       Variable("y"),
       Block(
-        Assign("r", Plus(Variable("r"), Variable("x"))),
-        Assign("y", Minus(Variable("y"), Constant(1)))
+        Assign("r",Plus(Constant(5), Variable("x"))),
+        Assign("y", Minus(Constant(5), Constant(1)))
       )
     );
 }
