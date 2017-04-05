@@ -44,7 +44,11 @@ object CombinatorParser extends JavaTokenParsers {
   def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s, r) }
 
   /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
-  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
+  //def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
+  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ opt(block | "else" ~ block) ^^ {
+    case l ~ Some("if" ~ "(" ~ e ~ ")" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
+    case l ~ Some("if" ~ "(" ~ e ~ ")" ~ "else" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
+  }
   /*I think this might be wrong... but, idk, i tried to model it off of the example below (the example is a parser but just written differently):
  def Cond = rule {
     "if" ~ WhiteSpace ~ ws('(') ~ Assignment ~ ws(')') ~ (

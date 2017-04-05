@@ -2,7 +2,7 @@ package edu.luc.cs.laufer.cs473.expressions
 
 import ast._
 
-object behaviors {
+object behaviors { // DON"T Have to implement until project 3b, I think
 
   def evaluate(e: Expr): Int = e match {
     case Constant(c) => c
@@ -12,17 +12,17 @@ object behaviors {
     case Times(l, r) => evaluate(l) * evaluate(r)
     case Div(l, r)   => evaluate(l) / evaluate(r)
     case Mod(l, r)   => evaluate(l) % evaluate(r)
-    case Variable(e) => {
+    /*case Variable(e) => {
       val x = List(e)
       x.foldLeft(0){
          (z, e) =>
          return (z)
        }
-    }
-    case Block(l) => evaluate(l)
+    }*/
+    //case Block(l) => evaluate(l)
     //case Cond(l,r,x) =>
     //case Loop(l,r) =>
-    case Assign(l,r) => evaluate(r)
+    //case Assign(l,r) => evaluate(r)
   }
 
   def size(e: Expr): Int = e match {
@@ -34,10 +34,10 @@ object behaviors {
     case Div(l, r)   => 1 + size(l) + size(r)
     case Mod(l, r)   => 1 + size(l) + size(r)
     case Variable(s) => 1
-    case Block(l) => 1 + size(l)
+    //case Block(l) => 1 + size(l)
     //case Cond(l,r,x) =>
     //case Loop(l,r) =>
-    case Assign(l,r) => 1 + size(r)
+    //case Assign(l,r) => 1 + size(r)
  }
 
   def height(e: Expr): Int = e match {
@@ -48,11 +48,11 @@ object behaviors {
     case Times(l, r) => 1 + math.max(height(l), height(r))
     case Div(l, r)   => 1 + math.max(height(l), height(r))
     case Mod(l, r)   => 1 + math.max(height(l), height(r))
-    case Variable(s) => 1
-    case Block(l) => 1 + height(l)
+    //case Variable(s) => 1
+    //case Block(l) => 1 + height(l)
    // case Cond(l,r,x) =>
     //case Loop(l,r) =>
-    case Assign(l,r) => 1 + height(r)
+    //case Assign(l,r) => 1 + height(r)
   }
 
   def toFormattedString(prefix: String)(e: Expr): String = e match {
@@ -63,7 +63,7 @@ object behaviors {
     case Times(l, r) => buildExprString(prefix, "Times", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Div(l, r)   => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Mod(l, r)   => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
-    case Variable(s) => prefix + s.toString
+    //case Variable(s) => prefix + s.toString
     //case Block(l) =>
     //case Cond(l,r,x) =>
     //case Loop(l,r) =>
