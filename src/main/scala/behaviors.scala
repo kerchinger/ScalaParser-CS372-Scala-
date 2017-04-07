@@ -63,14 +63,26 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Times(l, r) => buildExprString(prefix, "Times", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Div(l, r)   => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Mod(l, r)   => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
-    //case Variable(s) => prefix + s.toString
-    //case Block(l) =>
-    //case Cond(l,r,x) =>
-    //case Loop(l,r) =>
-    //case Assign(l,r) =>
+    case Variable(s) => prefix + s.toString
+    case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.expressions))
+    case Cond(l,r,x) => buildCondExprString(prefix, toFormattedString(prefix + INDENT)(l),
+      toFormattedString(prefix)(r), toFormattedString(prefix + INDENT)(x))
+    case Loop(l,r) => buildLoopExprString(prefix, toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Assign(l,r) => buildExprString(prefix, "Assign", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
   }
 
   def toFormattedString(e: Expr): String = toFormattedString("")(e)
+
+  def toFormattedStrings(prefix: String)(e: Seq[_]): String = {
+    val result = new StringBuilder(prefix)
+    if (e.nonEmpty) {
+      for (exp <- e) {
+        result.append(toFormattedString(prefix)(exp.asInstanceOf[Expr]))
+        result.append(EOL)
+      }
+    }
+    result.toString()
+  }
 
   def buildExprString(prefix: String, nodeString: String, leftString: String, rightString: String) = {
     val result = new StringBuilder(prefix)
@@ -93,6 +105,40 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     result.append(exprString)
     result.append(")")
     result.toString
+  }
+
+  def buildBlockExprString(prefix: String, exprString: String) = {
+    val result = new StringBuilder(prefix)
+    if (exprString.trim.length > 0) {
+      result.append("{")
+      result.append(EOL)
+      result.append(exprString.lines.map(s => INDENT + s).mkString(EOL))
+      result.append(EOL)
+      result.append("}")
+    }
+    result.toString()
+  }
+
+  def buildLoopExprString(prefix: String, exprString: String, blockString: String) = {
+    val result = new StringBuilder(prefix)
+    result.append("while (")
+    result.append(exprString)
+    result.append(") ")
+    result.append(blockString)
+    result.toString()
+  }
+
+  def buildCondExprString(prefix: String, ifString: String, blockString: String, elseBlock: String) = {
+    val result = new StringBuilder(prefix)
+    result.append("if (")
+    result.append(ifString.dropRight(1))
+    result.append(") ")
+    result.append(blockString)
+    if (elseBlock.trim.length > 0) {
+      result.append(" else ")
+      result.append(elseBlock)
+    }
+    result.toString()
   }
 
   val EOL = scala.util.Properties.lineSeparator

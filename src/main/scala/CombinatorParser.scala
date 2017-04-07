@@ -28,12 +28,12 @@ object CombinatorParser extends JavaTokenParsers {
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-    | ident ^^ {case s => Variable(s)} //TODO get "scala.MatchError: Variable(y)" when running this
+    | ident ^^ (f => Variable(f)) //TODO get "scala.MatchError: Variable(y)" when running this
   )
 
   /**statement ::= expression ";" | assignment | conditional | loop | block*/
-  def statement: Parser[Expr] = ( //TODO DOES NOT WORK
-    expr ~ ";" ^^ {case s ~ _ => s}
+  def statement: Parser[Expr] = ( //TODO DOES NOT WORK, i have no idea
+    expr <~ ";" ^^ {case s => s}
     | assignment
     | conditional
     | loop
@@ -41,11 +41,11 @@ object CombinatorParser extends JavaTokenParsers {
   )
 
   /**assignment ::= ident "=" expression ";"*/
-  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) } // TODO THIS ALSO DOESN'T WORK
+  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) } // TODO THIS ALSO DOESN'T WORK, also think this is correct
 
   /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
   //def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
-  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ opt(block | "else" ~ block) ^^ { //TODO DOES NOT WORK
+  def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ opt(block | "else" ~ block) ^^ { //TODO DOES NOT WORK, definetly not correct
     case l ~ Some("if" ~ "(" ~ e ~ ")" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
     case l ~ Some("if" ~ "(" ~ e ~ ")" ~ "else" ~ b) => Cond(e.asInstanceOf[Expr], b.asInstanceOf[Expr], b.asInstanceOf[Expr])
   }
@@ -59,8 +59,8 @@ object CombinatorParser extends JavaTokenParsers {
    */
 
   /**loop ::= "while" "(" expression ")" block*/
-  def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK
+  def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK, i think this is correct
  /** block ::= "{" statement* "}"*/
-  def block: Parser[Expr] = "{" ~> (statement*) <~ "}" ^^ { case s  => Block(s:_*) } // TODO THIS IS NEEDS TO BE CHANGED
+  def block: Parser[Expr] = "{" ~> (statement*) <~ "}" ^^ { case s  => Block(s:_*) } // TODO THIS IS NEEDS TO BE CHANGED, I think this is also correct
 
 }
