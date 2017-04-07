@@ -22,17 +22,17 @@ object CombinatorParser extends JavaTokenParsers {
       case l ~ Some("%" ~ r) => Mod(l, r)
     }
 
-  /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" */
+  /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" | ident */
   def factor: Parser[Expr] = (
     wholeNumber ^^ { case s => Constant(s.toInt) }
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-    | ident ^^ {case s => Variable(s) }//TODO get "scala.MatchError: Variable(y)" when running this
+    | ident ^^ {case s => Variable(s)} //TODO get "scala.MatchError: Variable(y)" when running this
   )
 
   /**statement ::= expression ";" | assignment | conditional | loop | block*/
-  def statement: Parser[Expr] = (
+  def statement: Parser[Expr] = ( //TODO DOES NOT WORK
     expr ~ ";" ^^ {case s ~ _ => s}
     | assignment
     | conditional
@@ -41,7 +41,7 @@ object CombinatorParser extends JavaTokenParsers {
   )
 
   /**assignment ::= ident "=" expression ";"*/
-  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s, r) } // TODO THIS ALSO DOESN'T WORK
+  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) } // TODO THIS ALSO DOESN'T WORK
 
   /**conditional ::= "if" "(" expression ")" block [ "else" block ]*/
   //def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }
@@ -59,9 +59,8 @@ object CombinatorParser extends JavaTokenParsers {
    */
 
   /**loop ::= "while" "(" expression ")" block*/
-  def loop: Parser[Expr] = "while" ~ "(" ~ expr ~ ")" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK
-
+  def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK
  /** block ::= "{" statement* "}"*/
-  def block: Parser[Expr] = "{" ~ statement ~ "}" ^^ { case _ ~ s ~ _ => Block(s) } // TODO THIS IS NEEDS TO BE CHANGED
+  def block: Parser[Expr] = "{" ~> (statement*) <~ "}" ^^ { case s  => Block(s:_*) } // TODO THIS IS NEEDS TO BE CHANGED
 
 }

@@ -1,13 +1,10 @@
 package edu.luc.cs.laufer.cs473.expressions
 
-import org.parboiled2.ParseError
-import scala.util.{ Failure, Success }
-
 object
 PegCalculator extends App {
 
   def processExpr(input: String): Unit = {
-    println("You entered: " + input)
+    /*println("You entered: " + input)
     val parser = new PegParser(input)
     parser.InputLine.run() match {
       case Failure(error: ParseError) =>
@@ -21,9 +18,9 @@ PegCalculator extends App {
         println(toFormattedString(expr))
         println("It has size " + size(expr) + " and height " + height(expr))
         println("It evaluates to " + evaluate(expr))
-    }
+    }*/
   }
-
+/*
   if (args.length > 0) {
     processExpr(args mkString " ")
   } else {
@@ -33,4 +30,5 @@ PegCalculator extends App {
       print("Enter infix expression: ")
     }
   }
+  */
 }

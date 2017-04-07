@@ -1,10 +1,9 @@
 package edu.luc.cs.laufer.cs473.expressions
 
 import org.parboiled2._
-import ast._
 
 class PegParser(val input: ParserInput) extends Parser {
-
+/*
   def InputLine = rule { WhiteSpace ~ Expression ~ EOI }
 
   /** expression ::= term { { "+" | "-" } term }* */
@@ -43,4 +42,5 @@ class PegParser(val input: ParserInput) extends Parser {
   def WhiteSpace = rule { zeroOrMore(WhiteSpaceChar) }
 
   def ws(c: Char) = rule { c ~ WhiteSpace }
+  */
 }
