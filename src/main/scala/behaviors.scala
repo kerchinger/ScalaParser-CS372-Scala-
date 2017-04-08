@@ -12,7 +12,7 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Times(l, r) => evaluate(l) * evaluate(r)
     case Div(l, r)   => evaluate(l) / evaluate(r)
     case Mod(l, r)   => evaluate(l) % evaluate(r)
-    //case Variable(f) => evaluate(f)
+    //case Variable(f) => evaluate(f).AsInstanceOf[Expr]
     /*case Variable(e) => {
       val x = List(e)
       x.foldLeft(0){

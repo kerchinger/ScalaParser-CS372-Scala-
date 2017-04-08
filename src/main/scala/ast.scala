@@ -16,6 +16,6 @@ case class Block(expressions: Expr*) extends Expr {
   require(expressions != null)
   require(!expressions.contains(null))
 }
-case class Cond(guard: Expr, thenBranch: Expr, elseBranch: Expr) extends Expr // TODO I question whether this should be guard, then, else; maybe it should be then, else
+case class Cond(guard: Expr, thenBranch: Expr, elseBranch: Expr) extends Expr // TODO I question whether this should be guard, then, else; maybe it should be then, else - I think the way this is written is fine
 case class Loop(guard: Expr, body: Expr) extends BinaryExpr(guard, body)
 case class Assign(left: Expr, right: Expr) extends BinaryExpr(left, right) // left could also be left:String
