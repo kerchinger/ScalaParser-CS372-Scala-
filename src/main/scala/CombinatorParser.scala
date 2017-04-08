@@ -28,7 +28,7 @@ object CombinatorParser extends JavaTokenParsers {
     | "+" ~> factor ^^ { case e => e }
     | "-" ~> factor ^^ { case e => UMinus(e) }
     | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-    | ident ^^ (f => Variable(f)) //TODO get "scala.MatchError: Variable(y)" when running this
+    | ident ^^ { case f => Variable(f) } //TODO get "scala.MatchError: Variable(y)" when running this
   )
 
   /**statement ::= expression ";" | assignment | conditional | loop | block*/

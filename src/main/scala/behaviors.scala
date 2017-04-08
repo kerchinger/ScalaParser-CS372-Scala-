@@ -12,6 +12,7 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Times(l, r) => evaluate(l) * evaluate(r)
     case Div(l, r)   => evaluate(l) / evaluate(r)
     case Mod(l, r)   => evaluate(l) % evaluate(r)
+    //case Variable(f) => evaluate(f)
     /*case Variable(e) => {
       val x = List(e)
       x.foldLeft(0){
@@ -48,7 +49,7 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Times(l, r) => 1 + math.max(height(l), height(r))
     case Div(l, r)   => 1 + math.max(height(l), height(r))
     case Mod(l, r)   => 1 + math.max(height(l), height(r))
-    //case Variable(s) => 1
+    case Variable(s) => 1
     //case Block(l) => 1 + height(l)
    // case Cond(l,r,x) =>
     //case Loop(l,r) =>
