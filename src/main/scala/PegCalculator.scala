@@ -1,7 +1,7 @@
 package edu.luc.cs.laufer.cs473.expressions
 
 object
-PegCalculator extends App {
+PegCalculator {
 
   def processExpr(input: String): Unit = {
     /*println("You entered: " + input)
