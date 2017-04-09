@@ -49,27 +49,27 @@ object TestFixtures {
 
   //* Test for assignment*/
   val complex1string4 = "y = 5+2"
-  //val complex4 =
-      //Assign("y", Plus(Constant(5), Constant(2))
-    //);
+  val complex4 =
+      Assign(Variable("y"), Plus(Constant(5), Constant(2))
+    );
 
   //* Test for Conditional */
   val complex1string5 = "if (0) { r = 5+2 } else { y = 5-1 }"
-  //val complex5 =
-    //Cond(
-      //Constant(0),
-      //Assign("r", Plus(Constant(5), Variable("x"))),
-      //Assign("y", Minus(Constant(5), Constant(1)))
-    //);
+  val complex5 =
+    Cond(
+      Constant(0),
+      Assign(Variable("r"), Plus(Constant(5), Variable("x"))),
+      Assign(Variable("y"), Minus(Constant(5), Constant(1)))
+    );
 
   //* Test for Loop */
   val complex1string6 = "while (y) { r = 5+2 ; y = 3-1 }"
-  //val complex6 =
-    //Loop(
-      //Variable("y"),
-      //Block(
-        //Assign("r",Plus(Constant(5), Variable("x"))),
-        //Assign("y", Minus(Constant(3), Constant(1)))
-      //)
-    //);
+  val complex6 =
+    Loop(
+      Variable("y"),
+      Block(
+        Assign(Variable("r"),Plus(Constant(5), Variable("x"))),
+        Assign(Variable("y"), Minus(Constant(3), Constant(1)))
+      )
+    );
 }
