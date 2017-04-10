@@ -34,7 +34,7 @@ object CombinatorParser extends JavaTokenParsers {
     )
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
-  def statement: Parser[Expr] = (//TODO DOES NOT WORK, i have no idea
+  def statement: Parser[Expr] = (
     expr ~ ";" ^^ { case s ~_ => s }
       | assignment
       | conditional
@@ -43,7 +43,7 @@ object CombinatorParser extends JavaTokenParsers {
     )
 
   /** assignment ::= ident "=" expression ";" */
-  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) } // TODO THIS ALSO DOESN'T WORK, also think this is correct
+  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) }
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   //def conditional: Parser[Expr] = "if" ~ "(" ~ expr ~ ")" ~ block ~ "else" ~ block ^^ { case _ ~ _ ~ e ~ _ ~ b ~ _ ~ d => Cond(e, b, d) }

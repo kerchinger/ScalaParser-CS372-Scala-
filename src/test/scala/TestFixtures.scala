@@ -41,17 +41,15 @@ object TestFixtures {
     );
 
   //* Test for statement */
-  val complex1string3 = "{5+x;}"
+  val complex1string3 = "{5+5; 5+x}"
   val complex3 =
-    Block(
-       Plus(Constant(5), Variable("x"))
-    );
+    Block ( Plus(Constant(5), Constant(5)), Plus(Constant(5), Variable("x")))
+
 
   //* Test for assignment*/
   val complex1string4 = "y = 5+2;"
   val complex4 =
-      Assign(Variable("y"), Plus(Constant(5), Constant(2))
-    );
+      Assign(Variable("y"), Plus(Constant(5), Constant(2)));
 
   //* Test for Conditional */
   val complex1string5 = "if (0) { r = 5+2 } else { y = 5-1 }"
