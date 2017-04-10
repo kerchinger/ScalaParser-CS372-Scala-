@@ -48,7 +48,7 @@ object TestFixtures {
     );
 
   //* Test for assignment*/
-  val complex1string4 = "y = 5+2"
+  val complex1string4 = "y = 5+2;"
   val complex4 =
       Assign(Variable("y"), Plus(Constant(5), Constant(2))
     );

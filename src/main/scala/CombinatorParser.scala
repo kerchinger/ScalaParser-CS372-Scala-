@@ -7,7 +7,7 @@ import scala.util.parsing.combinator.JavaTokenParsers
 object CombinatorParser extends JavaTokenParsers {
 
   /** expr ::= term { { "+" | "-" } term }* */
-  def expr: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
+ def expr: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
     case a ~ b => (a /: b) {
       case (x, "+" ~ y) => Plus(x, y)
       case (x, "-" ~ y) => Minus(x, y)
@@ -20,9 +20,9 @@ object CombinatorParser extends JavaTokenParsers {
       case (x, "*" ~ y) => Times(x, y)
       case (x, "/" ~ y) => Div(x, y)
       case (x, "%" ~ y) => Mod(x, y)
-
     }
   }
+
 
   /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" | ident */
   def factor: Parser[Expr] = (
@@ -35,7 +35,7 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
   def statement: Parser[Expr] = (//TODO DOES NOT WORK, i have no idea
-    expr <~ ";" ^^ { case s => s }
+    expr ~ ";" ^^ { case s ~_ => s }
       | assignment
       | conditional
       | loop
@@ -56,6 +56,5 @@ object CombinatorParser extends JavaTokenParsers {
   def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK, i think this is correct
   /** block ::= "{" statement* "}" */
   def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) } // TODO THIS IS NEEDS TO BE CHANGED, I think this is also correct
-
 
 }
