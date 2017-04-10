@@ -1,4 +1,5 @@
 package edu.luc.cs.laufer.cs473.expressions
+import scala.language.postfixOps
 
 object TestFixtures {
 
@@ -43,7 +44,11 @@ object TestFixtures {
   //* Test for statement */
   val complex1string3 = "{5+5; 5+x;}"
   val complex3 =
-    Block ( Plus(Constant(5), Constant(5)), Plus(Constant(5), Variable("x")))
+    Block(
+      List(
+        Plus(Constant(5), Constant(5)), Plus(Constant(5), Variable("x"))
+      )
+    )
 
 
   //* Test for assignment*/
@@ -66,8 +71,13 @@ object TestFixtures {
     Loop(
       Variable("y"),
       Block(
-        Assign(Variable("r"),Plus(Constant(5), Variable("x"))),
-        Assign(Variable("y"), Minus(Constant(3), Constant(1)))
+        List(
+          Assign(Variable("r"),Plus(Constant(5), Variable("x"))),
+          Assign(Variable("y"), Minus(Constant(3), Constant(1)))
+        )
       )
     );
+  //val complexstring7 = "for (i = 0; i<5 ; i++) { x = x + 1;}"
+  //val complex7 =
+    //Loop
 }

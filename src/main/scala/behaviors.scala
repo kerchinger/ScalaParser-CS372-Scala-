@@ -1,5 +1,5 @@
 package edu.luc.cs.laufer.cs473.expressions
-
+import scala.language.postfixOps
 import ast._
 
 object behaviors { // DON"T Have to implement until project 3b, I think
@@ -12,7 +12,6 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Times(l, r) => evaluate(l) * evaluate(r)
     case Div(l, r)   => evaluate(l) / evaluate(r)
     case Mod(l, r)   => evaluate(l) % evaluate(r)
-    //case Variable(f) => evaluate(f).AsInstanceOf[Expr]
     /*case Variable(e) => {
       val x = List(e)
       x.foldLeft(0){
@@ -65,7 +64,7 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Div(l, r)   => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Mod(l, r)   => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Variable(s) => prefix + s.toString
-    case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.expressions))
+    case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.statements))
     case Cond(l,r,x) => buildCondExprString(prefix, toFormattedString(prefix + INDENT)(l),
       toFormattedString(prefix)(r), toFormattedString(prefix + INDENT)(x))
     case Loop(l,r) => buildLoopExprString(prefix, toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
