@@ -1,6 +1,6 @@
 package edu.luc.cs.laufer.cs473.expressions
-import behaviors._
-
+import edu.luc.cs.laufer.cs473.expressions.PrettyPrinter._
+import edu.luc.cs.laufer.cs473.expressions.behaviors._
 object CombinatorCalculator extends App {
 
   def processExpr(input: String): Unit = {
@@ -13,6 +13,8 @@ object CombinatorCalculator extends App {
       val expr = result.get
       println("The parsed expression is: ")
       println(toFormattedString(expr))
+      println("The unparsed expression is: ")
+      println(prettify(expr.toString()))
       //println("It has size " + size(expr) + " and height " + height(expr))
       //println("It evaluates to " + evaluate(expr))
     }
