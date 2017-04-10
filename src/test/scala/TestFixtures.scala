@@ -80,5 +80,5 @@ object TestFixtures {
       Constant(0),
       Block(
         Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
-      Block())
+      null)
 }

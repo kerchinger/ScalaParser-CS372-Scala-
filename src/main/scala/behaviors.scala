@@ -69,6 +69,7 @@ object behaviors {
     case Times(l, r) => buildExprString(prefix, "Times", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Div(l, r) => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Mod(l, r) => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+
     case Variable(s) => prefix + s.toString
 
     case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.statements))
@@ -119,7 +120,7 @@ object behaviors {
     if (exprString.trim.length > 0) {
       result.append("{")
       result.append(EOL)
-      result.append(exprString.lines.map(s => INDENT + s).mkString(EOL))
+      result.append(exprString.lines.map(s => /*INDENT +*/ s).mkString(EOL))
       result.append(EOL)
       result.append("}")
     }

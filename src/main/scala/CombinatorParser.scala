@@ -47,7 +47,7 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   def conditional: Parser[Expr] = "if" ~> ("(" ~> expr <~ ")") ~ block ~ opt("else" ~> block) ^^ {
-    case e ~ b1 ~ None => Cond(e, b1, Block(): Block)
+    case e ~ b1 ~ None => Cond(e, b1, null)
     case e ~ b1 ~ Some(b2) => Cond(e, b1, b2)
   }
 
