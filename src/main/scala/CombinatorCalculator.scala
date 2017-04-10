@@ -4,7 +4,7 @@ object CombinatorCalculator extends App {
 
   def processExpr(input: String): Unit = {
     println("You entered: " + input)
-    val result = CombinatorParser.parseAll(CombinatorParser.statement, input)
+    val result = CombinatorParser.parseAll(CombinatorParser.statement, input) // TODO changed CombinatorParser.Expr to CombinatorParser.statement. statmenet may actually need to be a block, idkj
     println("result " + result)
     if (result.isEmpty) {
       println("This expression could not be parsed")
