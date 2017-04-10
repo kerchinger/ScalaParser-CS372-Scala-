@@ -1,9 +1,8 @@
 package edu.luc.cs.laufer.cs473.expressions
 
+import edu.luc.cs.laufer.cs473.expressions.TestFixtures._
+import edu.luc.cs.laufer.cs473.expressions.behaviors._
 import org.scalatest.FunSuite
-
-import behaviors._
-import TestFixtures._
 
 object Main extends App {
   println("p = " + complex1)
@@ -19,10 +18,22 @@ object Main extends App {
 }
 
 class Test extends FunSuite {
-  test("evaluate(p)") { assert(evaluate(complex1) === -1) }
-  test("size(p)") { assert(size(complex1) === 9) }
-  test("height(p)") { assert(height(complex1) === 4) }
-  test("evaluate(q)") { assert(evaluate(complex2) === 0) }
-  test("size(q)") { assert(size(complex2) === 10) }
-  test("height(q)") { assert(height(complex2) === 5) }
+  test("evaluate(p)") {
+    assert(evaluate(complex1) === -1)
+  }
+  test("size(p)") {
+    assert(size(complex1) === 9)
+  }
+  test("height(p)") {
+    assert(height(complex1) === 4)
+  }
+  test("evaluate(q)") {
+    assert(evaluate(complex2) === 0)
+  }
+  test("size(q)") {
+    assert(size(complex2) === 10)
+  }
+  test("height(q)") {
+    assert(height(complex2) === 5)
+  }
 }
