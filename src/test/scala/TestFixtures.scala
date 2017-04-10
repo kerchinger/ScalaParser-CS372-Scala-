@@ -41,7 +41,7 @@ object TestFixtures {
     );
 
   //* Test for statement */
-  val complex1string3 = "{5+5; 5+x}"
+  val complex1string3 = "{5+5; 5+x;}"
   val complex3 =
     Block ( Plus(Constant(5), Constant(5)), Plus(Constant(5), Variable("x")))
 
@@ -52,7 +52,7 @@ object TestFixtures {
       Assign(Variable("y"), Plus(Constant(5), Constant(2)));
 
   //* Test for Conditional */
-  val complex1string5 = "if (0) { r = 5+2 } else { y = 5-1 }"
+  val complex1string5 = "if (0) { r = 5+2; } else { y = 5-1; }"
   val complex5 =
     Cond(
       Constant(0),
@@ -61,7 +61,7 @@ object TestFixtures {
     );
 
   //* Test for Loop */
-  val complex1string6 = "while (y) { r = 5+2 ; y = 3-1 }"
+  val complex1string6 = "while (y) { r = 5+2 ; y = 3-1; }"
   val complex6 =
     Loop(
       Variable("y"),

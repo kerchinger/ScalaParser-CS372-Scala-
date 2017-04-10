@@ -18,12 +18,12 @@ class TestCombinatorParser extends FunSuite {
   val parsedExpr3 = CombinatorParser.parseAll(CombinatorParser.statement, complex1string3)
   val parsedExpr4 = CombinatorParser.parseAll(CombinatorParser.statement, complex1string4)
   //val parsedExpr5 = CombinatorParser.parseAll(CombinatorParser.statement, complex1string5)
-  //val parsedExpr6 = CombinatorParser.parseAll(CombinatorParser.statement, complex1string6)
+  val parsedExpr6 = CombinatorParser.parseAll(CombinatorParser.statement, complex1string6)
 
   test("parser works 1") { assert(parsedExpr.get === complex1) }
   test("parser works 2") { assert(parsedExpr2.get === complex1) }
   test("parser works 3 Statement") { assert(parsedExpr3.get === complex3) }
   test("parser works 4 Assignment") { assert(parsedExpr4.get === complex4) }
   //test("parser works 5 Conditional") { assert(parsedExpr5.get === complex5) }
-  //test("parser works 6 Loop") { assert(parsedExpr6.get === complex6) }
+  test("parser works 6 Loop") { assert(parsedExpr6.get === complex6) }
 }

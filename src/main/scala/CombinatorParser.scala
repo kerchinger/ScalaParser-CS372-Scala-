@@ -35,7 +35,7 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
   def statement: Parser[Expr] = (
-    expr ~ ";" ^^ { case s ~_ => s }
+    expr <~ ";" ^^ { case s => s }
       | assignment
       | conditional
       | loop
@@ -55,6 +55,6 @@ object CombinatorParser extends JavaTokenParsers {
   /** loop ::= "while" "(" expression ")" block */
   def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) } //TODO DOES NOT WORK, i think this is correct
   /** block ::= "{" statement* "}" */
-  def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) } // TODO THIS IS NEEDS TO BE CHANGED, I think this is also correct
+  def block: Parser[Expr] = "{" ~> (statement*) <~ "}" ^^ { case s => Block(s:_*) } // TODO THIS IS NEEDS TO BE CHANGED, I think this is also correct
 
 }
