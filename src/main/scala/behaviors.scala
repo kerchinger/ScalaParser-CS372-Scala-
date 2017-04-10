@@ -5,7 +5,6 @@ import edu.luc.cs.laufer.cs473.expressions.ast._
 import scala.language.postfixOps
 
 object behaviors {
-  // DON"T Have to implement until project 3b, I think
 
   val EOL = scala.util.Properties.lineSeparator
   val INDENT = ".."
@@ -78,6 +77,8 @@ object behaviors {
     case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
   }
+
+  def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")(e)
 
   def toFormattedString(e: Expr): String = toFormattedString("")(e)
 
