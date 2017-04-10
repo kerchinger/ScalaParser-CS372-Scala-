@@ -77,7 +77,48 @@ object TestFixtures {
         )
       )
     );
-  //val complexstring7 = "for (i = 0; i<5 ; i++) { x = x + 1;}"
-  //val complex7 =
-    //Loop
+  //a <- 1 to 10
+  val complex1string7 = "for (a) { x = x + 1;}"
+  val complex7 =
+    Loop(
+      Variable("a"),
+      Block(
+        List(
+          Assign(Variable("x"),Plus(Variable("x"),Constant(1)))
+        )
+      )
+    )
+
+  val complex1string8 = "if (1) { x = 2; } else { x = 3; }"
+  val complex8 =
+    Cond(
+      Constant(1),
+      Block(
+        List(
+          Assign(Variable("x"),Constant(2))
+        )
+      ),
+      Block(
+        List(
+          Assign(Variable("x"),Constant(3))
+        )
+      )
+    )
+
+  val complex1string9 = "if (1) { x = 2; } "
+  val complex9 =
+    Cond(
+      Constant(1),
+      Block(
+        List(
+          Assign(Variable("x"),Constant(2))
+        )
+      ),
+      Block(
+        List(
+          null
+        )
+      )
+    )
+
 }

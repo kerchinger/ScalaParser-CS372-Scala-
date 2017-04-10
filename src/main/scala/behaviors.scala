@@ -64,6 +64,7 @@ object behaviors { // DON"T Have to implement until project 3b, I think
     case Div(l, r)   => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Mod(l, r)   => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
     case Variable(s) => prefix + s.toString
+
     case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.statements))
     case Cond(l,r,x) => buildCondExprString(prefix, toFormattedString(prefix + INDENT)(l),
       toFormattedString(prefix)(r), toFormattedString(prefix + INDENT)(x))
