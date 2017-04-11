@@ -7,6 +7,7 @@ import scala.util.parsing.combinator.JavaTokenParsers
 
 object CombinatorParser extends JavaTokenParsers {
 
+
   /** expr ::= term { { "+" | "-" } term }* */
   def expr: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
     case a ~ b => (a /: b) {

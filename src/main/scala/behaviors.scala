@@ -78,6 +78,24 @@ object behaviors {
     case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
   }
 
+  def toPrettyFormattedString(prefix: String)(e: Expr): String = e match {
+    case Constant(c) => c.toString
+    case UMinus(r) => buildUnaryExprString(prefix, "UMinus", toFormattedString(prefix + INDENT)(r))
+    case Plus(l, r) => buildExprString(prefix, "Plus", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Minus(l, r) => buildExprString(prefix, "Minus", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Times(l, r) => buildExprString(prefix, "Times", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Div(l, r) => buildExprString(prefix, "Div", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Mod(l, r) => buildExprString(prefix, "Mod", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+
+    case Variable(s) => prefix + s.toString
+
+    case Block(children @ _*) => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.statements))
+    case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix + INDENT)(l),
+      toFormattedString(prefix)(r), toFormattedString(prefix + INDENT)(x))
+    case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+  }
+
   def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")(e)
 
   def toFormattedString(e: Expr): String = toFormattedString("")(e)

@@ -46,8 +46,8 @@ object PrettyPrinter extends JavaTokenParsers {
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   def conditional: Parser[Any] = "if" ~> ("(" ~> expr <~ ")") ~ block ~ opt("else" ~> block) ^^ {
-    case e ~ b1 ~ None => ("if" +"(" +e+ ")" + EOL +b1)
-    case e ~ b1 ~ Some(b2) => ("if" +"(" +e+ ")" + EOL +b1 + EOL+ "else" + EOL+b2)
+    case e ~ b1 ~ None => ("if" +"(" + e + ")" + EOL +b1)
+    case e ~ b1 ~ Some(b2) => ("if" +"(" + e + ")" + EOL +b1 + EOL+ "else" + EOL+b2)
   }
 
   /** loop ::= "while" "(" expression ")" block */

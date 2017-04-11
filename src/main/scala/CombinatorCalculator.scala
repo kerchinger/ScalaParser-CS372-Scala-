@@ -13,7 +13,7 @@ object CombinatorCalculator extends App {
       println("The parsed expression is: ")
       println(toFormattedString(expr))
       println("The unparsed expression is: ")
-      println(PrettyPrinter.parseAll(PrettyPrinter.statement*,input).)
+      println(PrettyPrinter.parseAll(PrettyPrinter.statement*,input))
       //println("It has size " + size(expr) + " and height " + height(expr))
       //println("It evaluates to " + evaluate(expr))
     }
