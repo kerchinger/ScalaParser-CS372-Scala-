@@ -1,5 +1,4 @@
 package edu.luc.cs.laufer.cs473.expressions
-import edu.luc.cs.laufer.cs473.expressions.PrettyPrinter._
 import edu.luc.cs.laufer.cs473.expressions.behaviors._
 object CombinatorCalculator extends App {
 
@@ -14,7 +13,7 @@ object CombinatorCalculator extends App {
       println("The parsed expression is: ")
       println(toFormattedString(expr))
       println("The unparsed expression is: ")
-      println(prettify(expr.toString()))
+      println(PrettyPrinter.parseAll(PrettyPrinter.statement*,input).)
       //println("It has size " + size(expr) + " and height " + height(expr))
       //println("It evaluates to " + evaluate(expr))
     }
