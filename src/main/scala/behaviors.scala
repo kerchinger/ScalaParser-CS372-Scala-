@@ -7,7 +7,7 @@ import scala.language.postfixOps
 object behaviors {
 
   val EOL = scala.util.Properties.lineSeparator
-  val INDENT = ".."
+  val INDENT = "  "
 
   def evaluate(e: Expr): Int = e match {
     case Constant(c) => c
@@ -71,11 +71,11 @@ object behaviors {
 
     case Variable(s) => prefix + s.toString
 
-    case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix + INDENT)(b.statements))
-    case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix + INDENT)(l),
-      toFormattedString(prefix)(r), toFormattedString(prefix + INDENT)(x))
-    case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
-    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix + INDENT)(l), toFormattedString(prefix + INDENT)(r))
+    case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix )(b.statements ))
+    case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix )(l),
+      toFormattedString(prefix)(r), toFormattedString(prefix )(x))
+    case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix )(l), toFormattedString(prefix )(r))
+    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix )(l), toFormattedString(prefix )(r))
   }
 
 
@@ -128,7 +128,7 @@ object behaviors {
     if (exprString.trim.length > 0) {
       result.append("{")
       result.append(EOL)
-      result.append(exprString.lines.map(s => /*INDENT +*/ s).mkString(EOL))
+      result.append(exprString.lines.map(s => INDENT + s).mkString(EOL))
       result.append(EOL)
       result.append("}")
     }

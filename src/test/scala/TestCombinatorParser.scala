@@ -43,3 +43,12 @@ class TestCombinatorParser extends FunSuite {
     assert(parsedExpr7.get === complex7)
   }
 }
+
+class TestUnParser extends  FunSuite {
+  test("unparser works 1") { assert(PrettyPrinter.toFormattedString(parsed1) == unparsed1) }
+  test("unparser works 2") { assert(PrettyPrinter.toFormattedString(parsed2) == unparsed2) }
+  test("unparser works 3") { assert(PrettyPrinter.toFormattedString(parsed3) == unparsed3) }
+  test("unparser works 4") { assert(PrettyPrinter.toFormattedString(parsed4) == unparsed4) }
+  test("unparser works 5") { assert(PrettyPrinter.toFormattedString(parsed5) == unparsed5) }
+  test("unparser works 6") { assert(PrettyPrinter.toFormattedString(parsed6) == unparsed6) }
+}

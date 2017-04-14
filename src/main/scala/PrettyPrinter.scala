@@ -18,9 +18,6 @@ object PrettyPrinter extends JavaTokenParsers {
     result.toString()
   }
 
-  //def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")
-
-
   def toFormattedString(e: Expr): String = e match {
     case Constant(c) => c.toString
     case Variable(v) => v.toString
@@ -37,8 +34,6 @@ object PrettyPrinter extends JavaTokenParsers {
     case Block(children @_*) => buildBlockExprString(toFormattedStrings(children))
   }
 
-  //def toFormattedString(e: Expr): String = toFormattedString(e)
-  //TODO got weird parsing, but i fixed it after changing it to the different cases
   def buildExprString( opString: String, leftString: String, rightString: String) = {
     val result = new StringBuilder
     opString match {

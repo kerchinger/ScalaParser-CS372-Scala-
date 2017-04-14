@@ -7,7 +7,7 @@ object CombinatorCalculator extends App {
 
   def processExpr(input: String): Unit = {
     println("You entered: " + input)
-    val result = CombinatorParser.parseAll(CombinatorParser.statement*, input) // TODO changed CombinatorParser.Expr to CombinatorParser.statement. statmenet may actually need to be a block, idkj
+    val result = CombinatorParser.parseAll(CombinatorParser.statement*, input)
     println("result " + result)
     if (result.isEmpty) {
       println("This expression could not be parsed")
@@ -16,7 +16,7 @@ object CombinatorCalculator extends App {
       println("The parsed expression is: ")
       println(toFormattedString(expr))
       println("The unparsed expression is: ")
-      println(PrettyPrinter.toFormattedString(expr))// i think we could run a fold method to get ride of list here
+      println(PrettyPrinter.toFormattedString(expr))
       //println("It has size " + size(expr) + " and height " + height(expr))
       //println("It evaluates to " + evaluate(expr))
     }
