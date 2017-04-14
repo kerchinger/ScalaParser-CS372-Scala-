@@ -5,41 +5,42 @@ import scala.language.postfixOps
 import scala.util.parsing.combinator.JavaTokenParsers
 
 object PrettyPrinter extends JavaTokenParsers {
-  def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")(e)
+  def toFormattedString(e: Seq[Expr]): String = toFormattedStrings(e)
 
-  // e = a sequence of zero or more Expr
-  def toFormattedStrings(prefix: String)(e: Seq[_]): String = {
-    val result = new StringBuilder(prefix)
+  def toFormattedStrings(e: Seq[_]): String = {
+    val result = new StringBuilder
     if (e.nonEmpty) {
       for (exp <- e) {
-        result.append(toFormattedString(prefix)(exp.asInstanceOf[Expr]))
+        result.append(toFormattedString(exp.asInstanceOf[Expr]))
         result.append(EOL)
       }
     }
     result.toString()
   }
 
-  def toFormattedString(prefix: String)(e: Expr): String = e match {
-    case Variable(v)           => prefix + v.toString
-    case Constant(c)           => prefix + c.toString
-    case Assign(l, r)          => buildExprString(prefix, " = ", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
-    case Cond(i, b, eb) => buildCondExprString(prefix, toFormattedString(prefix)(i),
-      toFormattedString(prefix)(b), toFormattedString(prefix)(eb))
-    case Loop(exp, b)          => buildLoopExprString(prefix, toFormattedString(prefix)(exp), toFormattedString(prefix)(b))
-    // block always comes in as a block of a sequence of zero or more Expr
-    case b: Block    => buildBlockExprString(prefix, toFormattedStrings(prefix)(b.statements))
-    case UMinus(exp) => buildUnaryExprString(prefix, toFormattedString(prefix)(exp))
-    case Plus(l, r)  => buildExprString(prefix, " + ", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
-    case Minus(l, r) => buildExprString(prefix, " - ", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
-    case Times(l, r) => buildExprString(prefix, " * ", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
-    case Div(l, r)   => buildExprString(prefix, " / ", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
-    case Mod(l, r)   => buildExprString(prefix, "%", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
+  //def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")
+
+
+  def toFormattedString(e: Expr): String = e match {
+    case Constant(c) => c.toString
+    case Variable(v) => v.toString
+    case UMinus(exp) => buildUnaryExprString( toFormattedString(exp))
+    case Plus(l, r)  => buildExprString( " + ", toFormattedString(l), toFormattedString(r))
+    case Minus(l, r) => buildExprString( " - ", toFormattedString(l), toFormattedString(r))
+    case Times(l, r) => buildExprString( " * ", toFormattedString(l), toFormattedString(r))
+    case Div(l, r)   => buildExprString( " / ", toFormattedString(l), toFormattedString(r))
+    case Mod(l, r)   => buildExprString( "%", toFormattedString(l), toFormattedString(r))
+    case Assign(l, r)=> buildExprString( " = ", toFormattedString(l), toFormattedString(r))
+    case Cond(i, b, eb) => buildCondExprString( toFormattedString(i),
+      toFormattedString(b), toFormattedString(eb))
+    case Loop(l, r) => buildLoopExprString(toFormattedString(l), toFormattedString(r))
+    case Block(children @_*) => buildBlockExprString(toFormattedStrings(children))
   }
 
-  def toFormattedString(e: Expr): String = toFormattedString("")(e)
-
-  def buildExprString(prefix: String, opString: String, leftString: String, rightString: String) = {
-    val result = new StringBuilder(prefix)
+  //def toFormattedString(e: Expr): String = toFormattedString(e)
+  //TODO got weird parsing, but i fixed it after changing it to the different cases
+  def buildExprString( opString: String, leftString: String, rightString: String) = {
+    val result = new StringBuilder
     opString match {
       case " = " =>
         result.append(leftString)
@@ -56,20 +57,19 @@ object PrettyPrinter extends JavaTokenParsers {
     result.toString()
   }
 
-  def buildUnaryExprString(prefix: String, exprString: String) = {
-    val result = new StringBuilder(prefix)
+  def buildUnaryExprString( exprString: String) = {
+    val result = new StringBuilder
     result.append("(-")
     result.append(exprString)
     result.append(")")
     result.toString()
   }
 
-  def buildBlockExprString(prefix: String, exprString: String) = {
-    val result = new StringBuilder(prefix)
-    if (exprString.trim.length > 0) {
+  def buildBlockExprString( exprString: String) = {
+    val result = new StringBuilder
+    if (exprString.trim.length >= 0) {
       result.append("{")
       result.append(EOL)
-      // adds an indent to each line in the exprString
       result.append(exprString.lines.map(s => INDENT + s).mkString(EOL))
       result.append(EOL)
       result.append("}")
@@ -77,8 +77,9 @@ object PrettyPrinter extends JavaTokenParsers {
     result.toString()
   }
 
-  def buildLoopExprString(prefix: String, exprString: String, blockString: String) = {
-    val result = new StringBuilder(prefix)
+  //change blockString:String to blockString: Block
+  def buildLoopExprString( exprString: String, blockString: String) = {
+    val result = new StringBuilder
     result.append("while (")
     result.append(exprString)
     result.append(") ")
@@ -86,10 +87,11 @@ object PrettyPrinter extends JavaTokenParsers {
     result.toString()
   }
 
-  def buildCondExprString(prefix: String, ifString: String, blockString: String, elseBlock: String) = {
-    val result = new StringBuilder(prefix)
+  //Change String in the block to Block
+  def buildCondExprString (ifString: String, blockString: String, elseBlock: String) = {
+    val result = new StringBuilder
     result.append("if (")
-    result.append(ifString.dropRight(1))
+    result.append(ifString)
     result.append(") ")
     result.append(blockString)
     if (elseBlock.trim.length > 0) {
@@ -101,5 +103,4 @@ object PrettyPrinter extends JavaTokenParsers {
 
   val EOL = scala.util.Properties.lineSeparator
   val INDENT = "  "
-
 }

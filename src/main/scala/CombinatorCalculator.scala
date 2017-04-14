@@ -1,5 +1,8 @@
 package edu.luc.cs.laufer.cs473.expressions
 import edu.luc.cs.laufer.cs473.expressions.behaviors._
+import scala.language.postfixOps
+
+
 object CombinatorCalculator extends App {
 
   def processExpr(input: String): Unit = {
@@ -13,7 +16,7 @@ object CombinatorCalculator extends App {
       println("The parsed expression is: ")
       println(toFormattedString(expr))
       println("The unparsed expression is: ")
-      println(PrettyPrinter.toFormattedString(expr)) // i think we could run a fold method to get ride of list here
+      println(PrettyPrinter.toFormattedString(expr))// i think we could run a fold method to get ride of list here
       //println("It has size " + size(expr) + " and height " + height(expr))
       //println("It evaluates to " + evaluate(expr))
     }
