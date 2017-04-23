@@ -1,33 +1,40 @@
 package edu.luc.cs.laufer.cs473.expressions
 
-import edu.luc.cs.laufer.cs473.expressions.ast._
-
-import scala.language.postfixOps
-
+import ast._
 import scala.collection.immutable.Map
+import scala.util.Try
 
-/** Something that can be used on the right-hand side of an assignment. */
+
+/**
+  * Something that can be used on the right-hand side of an assignment.
+  */
 trait RValue[T] {
   def get: T
 }
 
-/** Something that can be used on the left-hand side of an assignment. */
+/**
+  * Something that can be used on the left-hand side of an assignment.
+  */
 trait LValue[T] extends RValue[T] {
   def set(value: T): LValue[T]
 }
 
-/** A cell for storing a value. */
+/**
+  * A cell for storing a value.
+  */
 case class Cell[T](var value: T) extends LValue[T] {
   override def get = value
   override def set(value: T) = { this.value = value; this }
 }
 
-/** A companion object defining a useful Cell instance. */
+/**
+  * A companion object defining a useful Cell instance.
+  */
 object Cell {
   val NULL = Cell(0)
 }
 
-/** An interpreter for expressions and statements. */
+
 object Execute {
 
   type Store = Map[String, LValue[Int]]
@@ -38,74 +45,66 @@ object Execute {
     case Minus(left, right) => Cell(apply(store)(left).get - apply(store)(right).get)
     case Times(left, right) => Cell(apply(store)(left).get * apply(store)(right).get)
     case Div(left, right)   => Cell(apply(store)(left).get / apply(store)(right).get)
+    case UMinus(value) => Cell(-apply(store)(value).get)
+    case Mod(left, right) => Cell(apply(store)(left).get % apply(store)(right).get)
+    //variable case only if key is already found in map
     case Variable(name)     => store(name)
-    case Assign(left, right) => {
-      val rvalue = apply(store)(right)
-      val lvalue = apply(store)(left)
-      lvalue.set(rvalue.get)
-    }
+    //TODO find a way to add a value to the store with assign
+    case Assign(left, right) =>
+      val rValue = apply(store)(right)
+      if (store contains left.asInstanceOf[Variable].toString) {
+        val lValue = apply(store)(left)
+        lValue.set(rValue.get)
+      }
+      else {store.toSet(left.asInstanceOf[Variable].toString, rValue)} //TODO right here is where it is not wo
+      Cell.NULL
+
     case Block(statements @ _*) =>
       statements.foldLeft(Cell.NULL.asInstanceOf[LValue[Int]])((c, s) => apply(store)(s))
-    case Loop(guard, body) => {
-      var gvalue = apply(store)(guard)
-      while (gvalue.get != 0) {
+    case Loop(guard, body) =>
+      var gValue = apply(store)(guard)
+      while (gValue.get != 0) {
         apply(store)(body)
-        gvalue = apply(store)(guard)
+        gValue = apply(store)(guard)
       }
       Cell.NULL
-    }
+    /*case Cond(Assign(left,right), block, elseBlock) =>
+      val rvalue = apply(store)(right)
+      val lvalue = apply(store)(left)
+      val result = Cell.NULL
+      if(rvalue.get == lvalue.get) {
+        result.set(apply(store)(block).get)
+      }
+      else {
+        if(elseBlock.expr.nonEmpty) {
+          result.set(apply(store)(elseBlock).get)
+        }
+      }
+      result*/
   }
 }
 
 object behaviors {
+  type Value = LValue[Int]
+  type Store = Map[String, LValue[Int]]
+  val result: Value = Cell.NULL
+
+  def evaluate(store: Store)(e: Seq[_]): Value = {
+    result.set(0)
+    if(e.nonEmpty) {
+      for (exp <- e) {
+        result.set(Try(Execute(store)(exp.asInstanceOf[Expr])).get.get)
+      }
+    }
+    result
+  }
+
+
+
 
   val EOL = scala.util.Properties.lineSeparator
   val INDENT = "  "
 
-  def evaluate(e: Expr): Int = e match {
-    case Constant(c) => c
-    case UMinus(r) => -evaluate(r)
-    case Plus(l, r) => evaluate(l) + evaluate(r)
-    case Minus(l, r) => evaluate(l) - evaluate(r)
-    case Times(l, r) => evaluate(l) * evaluate(r)
-    case Div(l, r) => evaluate(l) / evaluate(r)
-    case Mod(l, r) => evaluate(l) % evaluate(r)
-    /*case Variable(e) => {}*/
-    //case Block(l) => evaluate(l)
-    //case Cond(l,r,x) =>
-    //case Loop(l,r) =>
-    //case Assign(l,r) => evaluate(r)
-  }
-
-  def size(e: Expr): Int = e match {
-    case Constant(c) => 1
-    case UMinus(r) => 1 + size(r)
-    case Plus(l, r) => 1 + size(l) + size(r)
-    case Minus(l, r) => 1 + size(l) + size(r)
-    case Times(l, r) => 1 + size(l) + size(r)
-    case Div(l, r) => 1 + size(l) + size(r)
-    case Mod(l, r) => 1 + size(l) + size(r)
-    case Variable(s) => 1
-    //case Block(l) => 1 + size(l)
-    //case Cond(l,r,x) =>
-    //case Loop(l,r) =>
-    //case Assign(l,r) => 1 + size(r)
-  }
-
-  def height(e: Expr): Int = e match {
-    case Constant(c) => 1
-    case UMinus(r) => 1 + height(r)
-    case Plus(l, r) => 1 + math.max(height(l), height(r))
-    case Minus(l, r) => 1 + math.max(height(l), height(r))
-    case Times(l, r) => 1 + math.max(height(l), height(r))
-    case Div(l, r) => 1 + math.max(height(l), height(r))
-    case Mod(l, r) => 1 + math.max(height(l), height(r))
-    case Variable(s) => 1
-    //case Block(l) => 1 + height(l)
-    // case Cond(l,r,x) =>
-    //case Loop(l,r) =>
-    //case Assign(l,r) => 1 + height(r)
-  }
 
   def toFormattedString(prefix: String)(e: Expr): String = e match {
     case Constant(c) => prefix + c.toString
