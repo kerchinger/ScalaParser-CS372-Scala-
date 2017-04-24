@@ -1,75 +1,60 @@
 package edu.luc.cs.laufer.cs473.expressions
 
 import edu.luc.cs.laufer.cs473.expressions.ast._
+import edu.luc.cs.laufer.cs473.expressions.evaluate.{Cell, Num}
 
 import scala.collection.mutable.Map
 import scala.util.Try
+object evaluate {
 
+  import ast._
 
-/**
-  * Something that can be used on the right-hand side of an assignment.
-  */
-trait RValue[T] {
-  def get: T
+  case class Cell(var value: Value) {
+    def get: Value = value
+    def set(value: Value): Unit = this.value = value
+  }
+
+  object Cell {
+    def apply(i: Int): Cell = Cell(Num(i))
+    val NULL = Cell(0)
+  }
+
+  type Instance = Map[String, Cell]
+
+  type Store = Instance
+
+  sealed trait Value
+
+  case class Num(value: Int) extends Value
+
+  def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Cell ={
+  val l: Int = apply(store)(left).value.asInstanceOf[Num].value
+  val r: Int = apply(store)(right).value.asInstanceOf[Num].value
+  Cell(Num(op(l, r)))
 }
 
-/**
-  * Something that can be used on the left-hand side of an assignment.
-  */
-trait LValue[T] extends RValue[T] {
-  def set(value: T): LValue[T]
-}
-
-/**
-  * A cell for storing a value.
-  */
-case class Cell[T](var value: T) extends LValue[T] {
-  override def get = value
-  override def set(value: T) = { this.value = value; this }
-}
-
-/**
-  * A companion object defining a useful Cell instance.
-  */
-object Cell {
-  val NULL = Cell(0)
-}
-
-
-object Execute {
-
-  type Store = Map[String, LValue[Int]]
-
-  def apply(store: Store)(s: Expr): LValue[Int] = s match {
-    case Constant(value)    => Cell(value)
-    case Plus(left, right)  => Cell(apply(store)(left).get + apply(store)(right).get)
-    case Minus(left, right) => Cell(apply(store)(left).get - apply(store)(right).get)
-    case Times(left, right) => Cell(apply(store)(left).get * apply(store)(right).get)
-    case Div(left, right)   => Cell(apply(store)(left).get / apply(store)(right).get)
-    case UMinus(value) => Cell(-apply(store)(value).get)
-    case Mod(left, right) => Cell(apply(store)(left).get % apply(store)(right).get)
-    //variable case only if key is already found in map
-    case Variable(name)     => store(name)
-    //TODO find a way to add a value to the store with assign
-
+  def apply(store: Store)(s: Expr): Cell = s match {
+    case Constant(value)    =>  { Cell(value) }
+    case Plus(left, right)  =>   binOp(store, left, right, _ + _)
+    case Minus(left, right) =>  { binOp(store, left, right, _ - _) }
+    case Times(left, right) =>  { binOp(store,left, right, _ * _) }
+    case Div(left, right)   =>  { binOp(store,left, right, _ / _) }
+    case Mod(left, right)   =>  { binOp(store,left, right, _ % _) }
+    case UMinus(expr)       =>  { Cell(Num(- expr.asInstanceOf[Constant].value)) }
+    case Variable(name)     =>  { store(name) }
     case Assign(left, right) =>
       val rValue = apply(store)(right)
       if (store contains left.asInstanceOf[Variable].toString) {
         val lValue = apply(store)(left)
         lValue.set(rValue.get)
-        println("Got in but didn't change")
       }
-      else {
-        store.put(left.asInstanceOf[Variable].toString, rValue)
-        println("Did not get in")
-      }
+      else {store.put(left.asInstanceOf[Variable].name, rValue)}
       Cell.NULL
-
     case Block(statements @ _*) =>
-      statements.foldLeft(Cell.NULL.asInstanceOf[LValue[Int]])((c, s) => apply(store)(s))
+      statements.foldLeft(Cell.NULL)((c, s) => apply(store)(s))
     case Loop(guard, body) =>
       var gValue = apply(store)(guard)
-      while (gValue.get != 0) {
+      while (gValue.value != Num(0)) {
         apply(store)(body)
         gValue = apply(store)(guard)
       }
@@ -82,31 +67,28 @@ object Execute {
         result.set(apply(store)(block).get)
       }
       else {
-        if(elseBlock.expr.nonEmpty) {
+        if(elseBlock.equals(Nil)) {
           result.set(apply(store)(elseBlock).get)
         }
       }
       result*/
   }
 }
-
 object behaviors {
-  type Value = LValue[Int]
-  type Store = Map[String, LValue[Int]]
+
+  type Value = Cell
+  type Store = Map[String, Cell]
   val result: Value = Cell.NULL
 
-  def evaluate(store: Store)(e: Seq[_]): Value = {
-    result.set(0)
+  def execute(store: Store)(e: Seq[_]): Cell = {
+    result.set(Num(0))
     if(e.nonEmpty) {
       for (exp <- e) {
-        result.set(Try(Execute(store)(exp.asInstanceOf[Expr])).get.get)
+        result.set(Try(evaluate(store)(exp.asInstanceOf[Expr])).get.get)
       }
     }
     result
   }
-
-
-
 
   val EOL = scala.util.Properties.lineSeparator
   val INDENT = "  "
