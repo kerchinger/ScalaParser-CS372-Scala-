@@ -59,19 +59,16 @@ object evaluate {
         gValue = apply(store)(guard)
       }
       Cell.NULL
-    /*case Cond(Assign(left,right), block, elseBlock) =>
-      val rvalue = apply(store)(right)
-      val lvalue = apply(store)(left)
+    case Cond(guard, block, elseBlock) => // doesnt work for if (x=3;) { x; } else {r;}, but works for the other ones sort of the logic may be off
+      val gvalue = apply(store)(guard)
       val result = Cell.NULL
-      if(rvalue.get == lvalue.get) {
+      if(store contains gvalue.value.toString ) {
         result.set(apply(store)(block).get)
       }
-      else {
-        if(elseBlock.equals(Nil)) {
-          result.set(apply(store)(elseBlock).get)
-        }
+      else if(gvalue.get != result) {
+        result.set(apply(store)(elseBlock).get)
       }
-      result*/
+      result
   }
 }
 object behaviors {
