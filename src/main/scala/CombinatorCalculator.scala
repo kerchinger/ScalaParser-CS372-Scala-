@@ -1,5 +1,7 @@
 package edu.luc.cs.laufer.cs473.expressions
 import edu.luc.cs.laufer.cs473.expressions.behaviors._
+import scala.collection.mutable.Map
+
 
 import scala.language.postfixOps
 import scala.util.Try
@@ -8,7 +10,8 @@ import scala.util.Try
 object CombinatorCalculator extends App {
 
   type Store = Map[String, LValue[Int]]
-  val store: Store = Map.empty
+  var store: Store = Map.empty
+    //Map("x" -> Cell(5), "y" -> Cell(6), "r" -> Cell(0))
   type Value = LValue[Int]
 
   def processExpr(input: String): Unit = {
@@ -24,7 +27,7 @@ object CombinatorCalculator extends App {
       println("The unparsed expression is: ")
       println(PrettyPrinter.toFormattedString(expr))
      // println("It has size " + size(expr) + " and height " + height(expr)) looks like we don't need these!
-      println("It evaluates to " + Try(evaluate(store.asInstanceOf[behaviors.Store])(expr)))
+      println("It evaluates to " + Try(evaluate(store)(expr)))
     }
   }
 

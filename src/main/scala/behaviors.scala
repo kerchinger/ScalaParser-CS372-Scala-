@@ -1,7 +1,8 @@
 package edu.luc.cs.laufer.cs473.expressions
 
-import ast._
-import scala.collection.immutable.Map
+import edu.luc.cs.laufer.cs473.expressions.ast._
+
+import scala.collection.mutable.Map
 import scala.util.Try
 
 
@@ -50,13 +51,18 @@ object Execute {
     //variable case only if key is already found in map
     case Variable(name)     => store(name)
     //TODO find a way to add a value to the store with assign
+
     case Assign(left, right) =>
       val rValue = apply(store)(right)
       if (store contains left.asInstanceOf[Variable].toString) {
         val lValue = apply(store)(left)
         lValue.set(rValue.get)
+        println("Got in but didn't change")
       }
-      else {store.toSet(left.asInstanceOf[Variable].toString, rValue)} //TODO right here is where it is not wo
+      else {
+        store.put(left.asInstanceOf[Variable].toString, rValue)
+        println("Did not get in")
+      }
       Cell.NULL
 
     case Block(statements @ _*) =>
