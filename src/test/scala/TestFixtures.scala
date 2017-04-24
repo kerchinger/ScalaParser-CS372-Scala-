@@ -57,16 +57,26 @@ object TestFixtures {
     Assign(Variable("y"), Plus(Constant(5), Constant(2)))
 
   //* Test for Conditional */
-  val complex1string5 = "if (0) { r = 5+2; } else { y = 5-1; }"
+  /*val complex1string5 = "if (0) { r = 5+2; } else { y = 5-1; }" // I AM keeping in case we need to change the idea of Cond back to what it was before without the assignment in the if part
   val complex5 =
     Cond(
       Constant(0),
       Block(
         Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
       Block(
+        Assign(Variable("y"), Minus(Constant(5), Constant(1)))))*/
+
+  val complex1string5 = "if (r=4;) { r = 5+2; } else { y = 5-1; }"
+  val complex5 =
+    Cond(
+      Assign(Variable("r"), Constant(4)),
+      Block(
+        Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
+      Block(
         Assign(Variable("y"), Minus(Constant(5), Constant(1)))))
 
   //* Test for Loop */
+
   val complex1string6 = "while (y) { r = 5+2 ; y = 3-1; }"
   val complex6 =
     Loop(
@@ -75,13 +85,22 @@ object TestFixtures {
         Assign(Variable("r"), Plus(Constant(5), Constant(2))),
         Assign(Variable("y"), Minus(Constant(3), Constant(1)))))
 
-  val complex1string7 = "if (0) { r = 5+2;}"
+  /*val complex1string7 = "if (0) { r = 5+2;}"
   val complex7 =
     Cond(
       Constant(0),
       Block(
         Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
       Block())
+*/
+  val complex1string7 = "if (r=4;) { r = 5+2; }"
+  val complex7 =
+    Cond(
+      Assign(Variable("r"), Constant(4)),
+      Block(
+        Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
+      Block())
+
 
   // Test cases for the unparser
   val parsed1: Seq[Expr] = Seq(Assign(Variable("x"), Constant(5)))
@@ -101,4 +120,15 @@ object TestFixtures {
   val unparsed5 = "if ((2 - 9) = 9;) {" + EOL + "  x = 2;" + EOL + "} else {" + EOL + "  x = 3;" + EOL + "}" + EOL
   val unparsed6 = "while (y) {" + EOL + "  r = (5 + 2);" + EOL + "  y = (3 - 1);" + EOL + "}" + EOL
 
+//TEST cases for evaluater
+  val parsed11 = Assign(Variable("x"), Constant(5))
+  val parsed22 = Block(Assign(Variable("x"), Constant(5)), Assign(Variable("y"), Constant(7)))
+  val parsed33 = Block(Assign(Variable("y2"), Constant(6)), Assign(Variable("y4"), Constant(9)), Div(Minus(Plus(Constant(1), Variable("y2")),
+    Times(Constant(3), Variable("y4"))), Constant(5)))
+  val parsed44= Block(Assign(Variable("y2"), Constant(6)), Assign(Variable("y4"), Constant(9)), Assign(Variable("y4"), Div(Minus(Plus(Constant(1), Variable("y2")),
+    Times(Constant(3), Variable("y4"))), Constant(5))))
+  val parsed55= Cond(Assign(Minus(Constant(2), Constant(9)), Constant(9)), Block(Assign(Variable("x"), Constant(2))),
+    Block(Assign(Variable("x"), Constant(3))))
+  Assign(Variable("y"), Plus(Variable("y"), Constant(1)));
+  val parsed66 = Block(Assign(Variable("y"), Constant(2)), Loop(Variable("y"), Block(Assign(Variable("r"), Plus(Constant(5), Constant(2))), Assign(Variable("y"), Minus(Variable("y"), Constant(1))))))
 }

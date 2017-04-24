@@ -8,7 +8,6 @@ object MainCombinatorParser extends App {
   println(parsedExpr.get)
   println(complex1)
   println(parsedExpr.get == complex1)
-  println(behaviors.evaluate(parsedExpr.get))
 }
 
 class TestCombinatorParser extends FunSuite {
@@ -39,7 +38,7 @@ class TestCombinatorParser extends FunSuite {
   test("parser works 6 Loop") {
     assert(parsedExpr6.get === complex6)
   }
-  test("parser works 7 Loop #2") {
+  test("parser works 7 Cond #2") {
     assert(parsedExpr7.get === complex7)
   }
 }

@@ -23,6 +23,8 @@ object evaluate {
 
   type Store = Instance
 
+  type Result = Try[Value]
+
   sealed trait Value
 
   case class Num(value: Int) extends Value
@@ -59,14 +61,18 @@ object evaluate {
         gValue = apply(store)(guard)
       }
       Cell.NULL
-    case Cond(guard, block, elseBlock) => // doesnt work for if (x=3;) { x; } else {r;}, but works for the other ones sort of the logic may be off
-      val gvalue = apply(store)(guard)
+      /**TODO SO I KIND OF CHANGED THE STRUCTURE OF THIS, but we can change it back  */
+    case Cond(Assign(left, right), block, elseBlock) =>
+      val rvalue = apply(store)(right)
+      val lvalue = apply(store)(left)
       val result = Cell.NULL
-      if(store contains gvalue.value.toString ) {
+      if(rvalue.get == lvalue.get) {
         result.set(apply(store)(block).get)
       }
-      else if(gvalue.get != result) {
-        result.set(apply(store)(elseBlock).get)
+      else {
+        if(elseBlock != result) {
+          result.set(apply(store)(elseBlock).get)
+        }
       }
       result
   }

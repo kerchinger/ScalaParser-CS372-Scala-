@@ -2,38 +2,78 @@ package edu.luc.cs.laufer.cs473.expressions
 
 import edu.luc.cs.laufer.cs473.expressions.TestFixtures._
 import edu.luc.cs.laufer.cs473.expressions.behaviors._
-import org.scalatest.FunSuite
+import edu.luc.cs.laufer.cs473.expressions.evaluate.Cell
+import org.scalatest.{BeforeAndAfter, FunSuite}
+
+import scala.collection.mutable.Map
+import scala.util.{Success, Try}
+
+
 
 object Main extends App {
-  println("p = " + complex1)
-  println("evaluate(p) = " + evaluate(complex1))
-  println("size(p) = " + size(complex1))
-  println("height(p) = " + height(complex1))
-  println(toFormattedString(complex1))
-  println("q = " + complex2)
-  println("evaluate(q) = " + evaluate(complex2))
-  println("size(q) = " + size(complex2))
-  println("height(q) = " + height(complex2))
-  println(toFormattedString(complex2))
-}
+  type Store = Map[String, Cell]
+  type Value = Cell
+  val store: Store = Map.empty
 
-class Test extends FunSuite {
-  test("evaluate(p)") {
-    assert(evaluate(complex1) === -1)
+  println("p = " + complex1)
+  println(toFormattedString(complex2))
+  println("evaluate(p) = " + execute(store.asInstanceOf[behaviors.Store])(complex1string2))
+  println()
+
+  store.clear()
+
+  println("q = " + complex2)
+  println(toFormattedString(complex2))
+  println("evaluate(q) = " + execute(store.asInstanceOf[behaviors.Store])(complex1string3))
+}
+class TestEvaluate extends FunSuite with BeforeAndAfter {
+
+  type Store = Map[String, Cell]
+  type Value = Cell
+  type Result = Try[Value]
+  val store: Store = Map.empty
+
+  before {
+    store.clear()
   }
-  test("size(p)") {
-    assert(size(complex1) === 9)
+
+  test("evaluate expr1") {
+    assert(Try(evaluate(store)(parsed11)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(store.size === 1)
+    assert(store("x") === Cell(5))
   }
-  test("height(p)") {
-    assert(height(complex1) === 4)
+
+  test("evaluate expr2") {
+    assert(Try(evaluate(store)(parsed22)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(store.size === 2)
+    assert(store("x") === Cell(5))
+    assert(store("y") === Cell(7))
   }
-  test("evaluate(q)") {
-    assert(evaluate(complex2) === 0)
+
+  test("evaluate expr3") {
+    assert(Try(evaluate(store)(parsed33)) === Success(Cell(-4).asInstanceOf[Value]))
+    assert(store.size === 2)
+    assert(store("y2") === Cell(6))
+    assert(store("y4") === Cell(9))
   }
-  test("size(q)") {
-    assert(size(complex2) === 10)
+
+  test("evaluate expr4") {
+    assert(Try(evaluate(store)(parsed44)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(store.size === 2)
+    assert(store("y2") === Cell(6))
+    assert(store("y4") === Cell(-4))
   }
-  test("height(q)") {
-    assert(height(complex2) === 5)
+
+  test("evaluate expr5") {
+    assert(Try(evaluate(store)(parsed55)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(store.size === 1)
+    assert(store("x") === Cell(3))
   }
+
+  test("evaluate expr6") {
+    assert(Try(evaluate(store)(parsed66)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(store.size === 2)
+    assert(store("y") === Cell(0))
+  }
+
 }
