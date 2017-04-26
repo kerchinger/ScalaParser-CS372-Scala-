@@ -38,40 +38,40 @@ class TestEvaluate extends FunSuite with BeforeAndAfter {
   }
 
   test("evaluate expr1") {
-    assert(Try(evaluate(store)(parsed11)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed11)) === Success(Success(Cell(0).asInstanceOf[Value])))
     assert(store.size === 1)
     assert(store("x") === Cell(5))
   }
 
   test("evaluate expr2") {
-    assert(Try(evaluate(store)(parsed22)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed22)) === Success(Success(Cell(0).asInstanceOf[Value])))
     assert(store.size === 2)
     assert(store("x") === Cell(5))
     assert(store("y") === Cell(7))
   }
 
   test("evaluate expr3") {
-    assert(Try(evaluate(store)(parsed33)) === Success(Cell(-4).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed33)) === Success(Success(Cell(-4).asInstanceOf[Value])))
     assert(store.size === 2)
     assert(store("y2") === Cell(6))
     assert(store("y4") === Cell(9))
   }
 
   test("evaluate expr4") {
-    assert(Try(evaluate(store)(parsed44)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed44)) === Success(Success(Cell(0).asInstanceOf[Value])))
     assert(store.size === 2)
     assert(store("y2") === Cell(6))
     assert(store("y4") === Cell(-4))
   }
 
   test("evaluate expr5") {
-    assert(Try(evaluate(store)(parsed55)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed55)) === Success(Success(Cell(0).asInstanceOf[Value])))
     assert(store.size === 1)
-    assert(store("x") === Cell(3))
+    assert(store("x") === Cell(2))
   }
 
   test("evaluate expr6") {
-    assert(Try(evaluate(store)(parsed66)) === Success(Cell(0).asInstanceOf[Value]))
+    assert(Try(evaluate(store)(parsed66)) === Success(Success(Cell(0).asInstanceOf[Value])))
     assert(store.size === 2)
     assert(store("y") === Cell(0))
   }

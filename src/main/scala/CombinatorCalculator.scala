@@ -11,7 +11,6 @@ object CombinatorCalculator extends App {
 
   type Store = Map[String, Cell]
   var store: Store = Map.empty
-    //Map("x" -> Cell(5), "y" -> Cell(6), "r" -> Cell(0))
   type Value = Cell
 
   def processExpr(input: String): Unit = {
