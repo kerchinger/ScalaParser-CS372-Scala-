@@ -45,3 +45,7 @@ case class Loop(guard: Expr, body: Expr) extends Expr
 
 case class Assign(left: Expr, right: Expr) extends Expr
 
+case class Field(left: String, right: Expr) extends Expr
+
+case class Struct(left: Expr, fields: Expr*) extends Expr
+

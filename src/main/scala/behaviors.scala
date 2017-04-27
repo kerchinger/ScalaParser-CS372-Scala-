@@ -4,7 +4,7 @@ import edu.luc.cs.laufer.cs473.expressions.ast._
 import edu.luc.cs.laufer.cs473.expressions.evaluate.{Cell, Num}
 
 import scala.collection.mutable.Map
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 object evaluate {
 
   import ast._
@@ -23,75 +23,58 @@ object evaluate {
 
   type Store = Instance
 
-  type Result = Try[Cell]
+  type Result = Try[Value]
 
   sealed trait Value
 
-  def lookup(store: Store)(name: String): Result =
-    store.get(name).fold {
-      Failure(new NoSuchFieldException(name)): Result
-    } {
-      Success(_)
-    }
-
   case class Num(value: Int) extends Value
 
-  def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Result ={
-    for { Cell(Num(l)) <- apply(store)(left); Cell(Num(r)) <- apply(store)(right) } yield Cell(Num(op(l, r)))
+  def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Cell ={
+  val l: Int = apply(store)(left).value.asInstanceOf[Num].value
+  val r: Int = apply(store)(right).value.asInstanceOf[Num].value
+  Cell(Num(op(l, r)))
 }
 
-  def apply(store: Store)(s: Expr): Result = s match {
-    case Constant(value)    =>  { Success(Cell(value)) }
+  def apply(store: Store)(s: Expr): Cell = s match {
+    case Constant(value)    =>  { Cell(value) }
     case Plus(left, right)  =>   binOp(store, left, right, _ + _)
     case Minus(left, right) =>  { binOp(store, left, right, _ - _) }
     case Times(left, right) =>  { binOp(store,left, right, _ * _) }
     case Div(left, right)   =>  { binOp(store,left, right, _ / _) }
     case Mod(left, right)   =>  { binOp(store,left, right, _ % _) }
-    case UMinus(expr)       =>  {  for { Cell(Num(e)) <- apply(store)(expr) } yield Cell(Num(-e)) }
-    case Variable(name)     =>  { lookup(store)(name) }
-
+    case UMinus(expr)       =>  { Cell(Num(- expr.asInstanceOf[Constant].value)) }
+    case Variable(name)     =>  { store(name) }
     case Assign(left, right) =>
       val rValue = apply(store)(right)
-      if (store contains left.asInstanceOf[Variable].toString){
-          val lValue = apply(store)(left)
-          lValue.get.set(rValue.get.get)
-        }
-      else {store.put(left.asInstanceOf[Variable].name, rValue.get)}
-      Success(Cell.NULL)
-
-    case Cond(guard, thenBranch, elseBranch) =>  {
-      apply(store)(guard) match {
-        case Success(Cell.NULL) => apply(store)(elseBranch)
-        case Success(_)         => apply(store)(thenBranch)
-        case f @ Failure(_)     => f
+      if (store contains left.asInstanceOf[Variable].toString) {
+        val lValue = apply(store)(left)
+        lValue.set(rValue.get)
       }
-    }
-    case Block(expressions @_*) =>
-      def doSequence: Result = {
-        val i = expressions.iterator
-        var result: Cell = Cell.NULL
-        while (i.hasNext) {
-          apply(store)(i.next()) match {
-            case Success(r)     => result = r
-            case f @ Failure(_) => return f
-          }
-        }
-        Success(result)
-      }
-       { doSequence }
+      else {store.put(left.asInstanceOf[Variable].name, rValue)}
+      Cell.NULL
+    case Block(statements @ _*) =>
+      statements.foldLeft(Cell.NULL)((c, s) => apply(store)(s))
     case Loop(guard, body) =>
-      def doLoop: Result = {
-        var gValue = apply(store)(guard)
-        while (gValue.get.value != Num(0)) {
-          apply(store)(guard) match {
-            case Success(Cell.NULL) => return Success(Cell.NULL)
-            case Success(v)         =>  apply(store)(body)
-            case f @ Failure(_)     => return f
-          }
-        }
-        Success(Cell.NULL)
+      var gValue = apply(store)(guard)
+      while (gValue.value != Num(0)) {
+        apply(store)(body)
+        gValue = apply(store)(guard)
       }
-       { doLoop }
+      Cell.NULL
+      /**TODO SO I KIND OF CHANGED THE STRUCTURE OF THIS, but we can change it back  */
+    case Cond(Assign(left, right), block, elseBlock) =>
+      val rvalue = apply(store)(right)
+      val lvalue = apply(store)(left)
+      val result = Cell.NULL
+      if(rvalue.get == lvalue.get) {
+        result.set(apply(store)(block).get)
+      }
+      else {
+        if(elseBlock != result) {
+          result.set(apply(store)(elseBlock).get)
+        }
+      }
+      result
   }
 }
 object behaviors {
@@ -104,7 +87,7 @@ object behaviors {
     result.set(Num(0))
     if(e.nonEmpty) {
       for (exp <- e) {
-        result.set(Try(evaluate(store)(exp.asInstanceOf[Expr])).get.get.value)
+        result.set(Try(evaluate(store)(exp.asInstanceOf[Expr])).get.get)
       }
     }
     result
