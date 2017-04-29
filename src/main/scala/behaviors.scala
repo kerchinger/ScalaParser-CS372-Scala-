@@ -53,7 +53,7 @@ object evaluate {
     case Assign(left, right) =>
       val rValue = apply(store)(right)
       if (store contains left.asInstanceOf[Variable].toString){
-        val lValue = apply(store)(left)
+        val lValue = apply(store)(left.asInstanceOf[Expr])
         lValue.get.set(rValue.get.get)
       }
       else {store.put(left.asInstanceOf[Variable].name, rValue.get)}
@@ -92,6 +92,16 @@ object evaluate {
         Success(Cell.NULL)
       }
     { doLoop }
+/*
+    case Struct(fields @ _*) =>
+      // create an object based on the list of field names in the clazz
+      Cell(Right(Map(fields.map(field => (field, Cell(0))): _*)))
+
+    case Select(record, field) => {
+      // assume the expression evaluates to a record (.right)
+      // and choose the desired field
+      apply(store)(record).get.right.get.apply(field)
+    }*/
   }
 }
 object behaviors {
@@ -129,7 +139,7 @@ object behaviors {
     case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix )(l),
       toFormattedString(prefix)(r), toFormattedString(prefix )(x))
     case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix )(l), toFormattedString(prefix )(r))
-    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix )(l), toFormattedString(prefix )(r))
+    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix )(l.asInstanceOf[Expr]), toFormattedString(prefix )(r))
   }
 
 
