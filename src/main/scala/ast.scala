@@ -49,3 +49,5 @@ case class Field(left: String, right: Expr) extends Expr
 
 case class Struct(left: Expr, fields: Expr*) extends Expr
 
+case class Select(lSelect:String, rSelect:String*) extends Expr
+

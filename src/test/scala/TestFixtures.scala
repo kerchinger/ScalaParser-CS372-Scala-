@@ -83,7 +83,11 @@ object TestFixtures {
       Block(
         Assign(Variable("r"), Plus(Constant(5), Constant(2)))),
       Block())
+  // Test for field
 
+  // Test for struct
+  //x = { a: 3 + 4, b: 5 + 6 };
+  //list = { head: 1, tail: { head: 2, tail: { head: 3, tail: 0 } } };
 
 
   // Test cases for the unparser

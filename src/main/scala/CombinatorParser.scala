@@ -26,12 +26,15 @@ object CombinatorParser extends JavaTokenParsers {
   }
 
   /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" | ident */
+  //factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
   def factor: Parser[Expr] = (
     wholeNumber ^^ { case s => Constant(s.toInt) }
       | "+" ~> factor ^^ { case e => e }
       | "-" ~> factor ^^ { case e => UMinus(e) }
       | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
       | ident ^^ { case f => Variable(f) }
+      | struct ^^ { case s => Struct(s) }
+      | ident ~ rep("{" ~> "." ~> ident) <~ "}" ^^ { case (i ~ i2) => Select(i, i2) }
     )
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
@@ -43,8 +46,12 @@ object CombinatorParser extends JavaTokenParsers {
       | block
     )
 
-  /** assignment ::= ident "=" expression ";" */
-  def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) }
+  /** assignment ::= idenidentt "=" expression ";" */
+  //assignment  ::= ident { "." ident }* "=" expression ";"
+  def assignment: Parser[Expr] = (
+      ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) }
+      | ident ~ rep("{" ~> "." ~> ident) <~ "}" ~ "=" ~ expr ~ ";" ^^ { case (i ~ i2) => Assign() }
+    )
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   def conditional: Parser[Expr] = "if" ~> ("(" ~> expr <~ ")") ~ block ~ opt("else" ~> block) ^^ {
@@ -59,9 +66,9 @@ object CombinatorParser extends JavaTokenParsers {
   def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) }
 
   /** struct ::= "{" "}" | "{" field { "," field }* "}" */
-  def Struct: Parser[Expr] = (
+  def struct: Parser[Expr] = (
     "{" ~ ident ~ "}" ^^ { case i => Variable(i.toString())}
-    | "{" ~ field ~ rep1("{" ~ "," ~ field ) ~ "}" ^^ { case f ~ f2 => Struct(f, f2)}
+    | "{" ~> field ~ rep("{" ~> "," ~> field) <~ "}" <~ "}" ^^ { case (f ~ f2) => Struct(f, f2)}
   )
 
   /** field  ::= ident ":" expr */
