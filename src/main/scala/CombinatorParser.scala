@@ -50,7 +50,7 @@ object CombinatorParser extends JavaTokenParsers {
   //assignment  ::= ident { "." ident }* "=" expression ";"
   def assignment: Parser[Expr] = (
       ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) }
-      | ident ~ rep("{" ~> "." ~> ident) <~ "}" ~ "=" ~ expr ~ ";" ^^ { case (i ~ i2) => Assign() }
+        | ident ~ "{" ~ "." ~ (ident *) ~ "}" ~ "=" ~ expr ~ ";" ^^ { case i ~ _ ~ _ ~ i2 ~ _ ~ _ ~ e ~ _ => Assign(Select(i, i2), e) }
     )
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
