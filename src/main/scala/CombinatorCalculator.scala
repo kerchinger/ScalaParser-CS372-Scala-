@@ -4,7 +4,6 @@ import edu.luc.cs.laufer.cs473.expressions.evaluate.Cell
 
 import scala.collection.mutable.Map
 import scala.language.postfixOps
-import scala.util.Try
 
 
 object CombinatorCalculator extends App {
@@ -26,7 +25,7 @@ object CombinatorCalculator extends App {
       println("The unparsed expression is: ")
       println(PrettyPrinter.toFormattedString(expr))
      // println("It has size " + size(expr) + " and height " + height(expr)) looks like we don't need these!
-      println("It evaluates to " + Try(execute(store)(expr)))
+      //println("It evaluates to " + Try(execute(store)(expr)))
     }
   }
 
