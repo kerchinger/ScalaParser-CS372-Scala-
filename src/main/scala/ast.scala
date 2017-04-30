@@ -44,7 +44,10 @@ case class Cond(guard: Expr, thenBranch: Expr, elseBranch: Expr) extends Expr
 
 case class Loop(guard: Expr, body: Expr) extends Expr
 
+//case class Assign(left: Expr, right: Expr) extends Expr
 case class Assign(left: Seq[Expr], right: Expr) extends Expr
+
+//case class Field(left: String, right: Expr) extends Expr
 
 case class Struct(fields: Map[Variable,Expr]) extends Expr
 

@@ -33,8 +33,8 @@ object CombinatorParser extends JavaTokenParsers {
       | "-" ~> factor ^^ { case e => UMinus(e) }
       | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
       | ident ^^ { case f => Variable(f) }
-      | struct ^^ { case s => Struct(s) }
-      | ident ~ rep("{" ~> "." ~> ident) <~ "}" ^^ { case (i ~ i2) => Select(i, i2) }
+      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
+      | struct
     )
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
@@ -48,16 +48,20 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** assignment ::= idenidentt "=" expression ";" */
   //assignment  ::= ident { "." ident }* "=" expression ";"
-  def assignment: Parser[Expr] = (
-      ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(Variable(s), r) }
-        | ident ~ "{" ~ "." ~ (ident *) ~ "}" ~ "=" ~ expr ~ ";" ^^ { case i ~ _ ~ _ ~ i2 ~ _ ~ _ ~ e ~ _ => Assign(Select(i, i2), e) }
-    )
+  def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
+
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   def conditional: Parser[Expr] = "if" ~> ("(" ~> expr <~ ")") ~ block ~ opt("else" ~> block) ^^ {
     case e ~ b1 ~ None => Cond(e, b1, Block(): Block)
     case e ~ b1 ~ Some(b2) => Cond(e, b1, b2)
   }
+
+  /** field  ::= ident ":" expr */
+  //(i, e).asInstanceOf[Expr]
+  def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => (i, e).asInstanceOf[Expr] }
+  //TODO idk if correct - needs to refer to the composite struct I believe
+
 
   /** loop ::= "while" "(" expression ")" block */
   def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) }
@@ -67,10 +71,11 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** struct ::= "{" "}" | "{" field { "," field }* "}" */
   def struct: Parser[Expr] = (
-    "{" ~ ident ~ "}" ^^ { case i => Variable(i.toString())}
-    | "{" ~> field ~ rep("{" ~> "," ~> field) <~ "}" <~ "}" ^^ { case (f ~ f2) => Struct(f, f2)}
-  )
+    "{" ~ ident ~ "}" ^^ { case i => Variable(i.toString()) }
+      | "{" ~> field ~ rep(field <~ ",") <~ "}" ^^ { case (f: Seq[(Variable, Expr)]) => Struct(f.toMap) } //TODO idk if correct
+    )
 
-  /** field  ::= ident ":" expr */
-  def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => Field(i,e) }
 }
+
+
+
