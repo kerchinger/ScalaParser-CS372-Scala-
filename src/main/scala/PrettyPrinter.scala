@@ -17,6 +17,19 @@ object PrettyPrinter extends JavaTokenParsers {
     }
     result.toString()
   }
+  def toFormattedStrings2(e: collection.Map[Variable,Expr]): String = {
+    val result = new StringBuilder
+    if (e.nonEmpty) {
+      for ((k,v) <- e) {
+        result.append(toFormattedString(k.asInstanceOf[Expr]))
+        result.append(" : ")
+        result.append(toFormattedString(v.asInstanceOf[Expr]))
+        result.append(EOL)
+      }
+    }
+    result.toString()
+  }
+
 
   def toFormattedString(e: Expr): String = e match {
     case Constant(c) => c.toString
@@ -28,10 +41,11 @@ object PrettyPrinter extends JavaTokenParsers {
     case Div(l, r)   => buildExprString( " / ", toFormattedString(l), toFormattedString(r))
     case Mod(l, r)   => buildExprString( "%", toFormattedString(l), toFormattedString(r))
     case Assign(l, r)=> buildExprString( " = ", toFormattedString(l), toFormattedString(r))
-    case Cond(i, b, eb) => buildCondExprString( toFormattedString(i),
-      toFormattedString(b), toFormattedString(eb))
+    case Cond(i, b, eb) => buildCondExprString( toFormattedString(i), toFormattedString(b), toFormattedString(eb))
     case Loop(l, r) => buildLoopExprString(toFormattedString(l), toFormattedString(r))
     case Block(children @_*) => buildBlockExprString(toFormattedStrings(children))
+    case Struct(m) => buildStructExprString(toFormattedStrings2(m))
+    case Select(l, r) => buildSelectString( toFormattedString(l), toFormattedStrings(r))
   }
 
   def buildExprString( opString: String, leftString: String, rightString: String) = {
@@ -59,13 +73,20 @@ object PrettyPrinter extends JavaTokenParsers {
     result.append(")")
     result.toString()
   }
-
+  def buildSelectString( s1: String, s2: String) = {
+    val result = new StringBuilder
+    result.append(s1)
+    if(s2.trim.length >= 0){
+      result.append(s2.lines.map(s => "." + s).mkString(EOL))
+    }
+    result.toString()
+  }
   def buildBlockExprString( exprString: String) = {
     val result = new StringBuilder
     if (exprString.trim.length >= 0) {
       result.append("{")
       result.append(EOL)
-      result.append(exprString.lines.map(s => INDENT + s).mkString(EOL))
+      result.append(exprString.lines.map(s => INDENT+ s).mkString(EOL))
       result.append(EOL)
       result.append("}")
     }
@@ -92,6 +113,17 @@ object PrettyPrinter extends JavaTokenParsers {
     if (elseBlock.trim.length > 0) {
       result.append(" else ")
       result.append(elseBlock)
+    }
+    result.toString()
+  }
+  def buildStructExprString( m: String) = {
+    val result = new StringBuilder
+    if (m.trim.length > 0) {
+      result.append("{")
+      result.append(EOL)
+      result.append(m) //.lines.map(s => INDENT + m).mkString(EOL))
+      result.append(EOL)
+      result.append("}")
     }
     result.toString()
   }

@@ -26,22 +26,17 @@ object CombinatorParser extends JavaTokenParsers {
     }
   }
 
-  /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" | ident */
-  //factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
+  /** factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct */
   def factor: Parser[Expr] = (
-    ident ~ rep("." ~> ident) ^^ { case f ~ f2 => Select(Variable(f), f2.map(Variable)) }
-    //rep1sep(ident, ".") ^^ { case f => f.map(Variable).asInstanceOf[Expr]}
+    (ident | struct) ~ rep("." ~> ident) ^^ {
+      case (f:String) ~ f2 => Select(Variable(f), f2.map(Variable))
+      case (f: Expr) ~ f2 => Select(f, f2.map(Variable))}
       | wholeNumber ^^ { case s => Constant(s.toInt) }
       | "+" ~> factor ^^ { case e => e }
       | "-" ~> factor ^^ { case e => UMinus(e) }
       | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-      | struct ^^ {case f => f}
+      | struct ^^ { case f => f}
     )
-
-  /** factor       ::= simplefactor { "." ident }*    */
-  //      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
-  //def factor2: Parser[Expr] =
-
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
   def statement: Parser[Expr] = (
@@ -52,23 +47,17 @@ object CombinatorParser extends JavaTokenParsers {
       | block
     )
 
-  /** assignment ::= idenidentt "=" expression ";" */
-  def assignment: Parser[Expr] =  ident ~ rep("." ~> ident) ~ "=" ~ expr ~ ";" ^^ { case x ~ t ~ _ ~ r ~ _ => Assign(Select(Variable(x),t.map(Variable)), r) }
-  //assignment  ::= ident { "." ident }* "=" expression ";"
-  //def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
-  //def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s.asInstanceOf[Seq[Expr]], r) }
-
+  /** assignment  ::= ident { "." ident }* "=" expression ";" */
+  def assignment: Parser[Expr] =  (ident | struct) ~ rep("." ~> ident) ~ ("=" ~> expr) <~ ";" ^^ {
+    case (x: String) ~ t ~ r => Assign(Select(Variable(x), t.map(Variable)), r)
+    case (x: Expr) ~ t ~ r => Assign(Select(x, t.map(Variable)), r)
+  }
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
   def conditional: Parser[Expr] = "if" ~> ("(" ~> expr <~ ")") ~ block ~ opt("else" ~> block) ^^ {
     case e ~ b1 ~ None => Cond(e, b1, Block(): Block)
     case e ~ b1 ~ Some(b2) => Cond(e, b1, b2)
   }
-
-  /** field  ::= ident ":" expr */
-  //(i, e).asInstanceOf[Expr]
-
-
 
   /** loop ::= "while" "(" expression ")" block */
   def loop: Parser[Expr] = "while" ~ "(" ~> expr ~ ")" ~ block ^^ { case e ~ _ ~ b => Loop(e, b) }
@@ -77,16 +66,35 @@ object CombinatorParser extends JavaTokenParsers {
   def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) }
 
   def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => Struct(Map(Variable(i) -> e)) }
-  //TODO idk if correct - needs to refer to the composite struct I believe
 
   /** struct ::= "{" "}" | "{" field { "," field }* "}" */
   def struct: Parser[Expr] = (
         "{" ~ "}" ^^ { case _ ~ _ =>  Struct(Map() ) }
           | "{" ~> rep1sep(field, ",")  <~ "}" ^^ { case f => Struct(f.map(s => (Variable(s.toString()),s)).toMap) }    )
-  //Struct(Map(null.asInstanceOf[Variable] -> null.asInstanceOf[Expr]))   :Map[Variable,Expr]  => f map { case (key, value) => Struct(key:_*) }
-//f.foldRight(f.head)((_, b) => b)
-  //::f
+
 }
 
 
+
+
+
+
+//factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
+//ident ~ rep("." ~> ident) ^^ { case f ~ f2 => Select(Variable(f), f2.map(Variable)) }
+//rep1sep(ident, ".") ^^ { case f => f.map(Variable).asInstanceOf[Expr]}
+
+/** factor       ::= simplefactor { "." ident }*    */
+//      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
+//def factor2: Parser[Expr] =
+
+//assignment  ::= ident { "." ident }* "=" expression ";"
+//def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
+//def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s.asInstanceOf[Seq[Expr]], r) }
+
+//Struct(Map(null.asInstanceOf[Variable] -> null.asInstanceOf[Expr]))   :Map[Variable,Expr]  => f map { case (key, value) => Struct(key:_*) }
+//f.foldRight(f.head)((_, b) => b)
+//::f
+
+/** field  ::= ident ":" expr */
+//(i, e).asInstanceOf[Expr]
 

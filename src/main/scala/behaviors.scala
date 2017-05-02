@@ -15,7 +15,7 @@ object evaluate {
   }
 
   object Cell {
-    def apply(i: Int): Cell = Cell(Num(i))
+    def apply(i: Int): Cell = Cell(Left(i))
     val NULL = Cell(0)
   }
 
@@ -25,7 +25,7 @@ object evaluate {
 
   type Result = Try[Cell]
 
-  sealed trait Value
+  type Value = Either[Int, Instance]
 
   def lookup(store: Store)(name: String): Result =
     store.get(name).fold {
@@ -34,10 +34,10 @@ object evaluate {
       Success(_)
     }
 
-  case class Num(value: Int) extends Value
+  //case class Num(value: Int)  extends Value
 
   def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Result ={
-    for { Cell(Num(l)) <- apply(store)(left); Cell(Num(r)) <- apply(store)(right) } yield Cell(Num(op(l, r)))
+    for { Cell(Left(l)) <- apply(store)(left); Cell(Left(r)) <- apply(store)(right) } yield Cell(Left(op(l, r)))
   }
 
   def apply(store: Store)(s: Expr): Result = s match {
@@ -47,7 +47,7 @@ object evaluate {
     case Times(left, right) =>  { binOp(store,left, right, _ * _) }
     case Div(left, right)   =>  { binOp(store,left, right, _ / _) }
     case Mod(left, right)   =>  { binOp(store,left, right, _ % _) }
-    case UMinus(expr)       =>  {  for { Cell(Num(e)) <- apply(store)(expr) } yield Cell(Num(-e)) }
+    case UMinus(expr)       =>  {  for { Cell(Left(e)) <- apply(store)(expr) } yield Cell(Left(-e)) }
     case Variable(name)     =>  { lookup(store)(name) }
 
     case Assign(left, right) =>
@@ -82,7 +82,7 @@ object evaluate {
     case Loop(guard, body) =>
       def doLoop: Result = {
         var gValue = apply(store)(guard)
-        while (gValue.get.value != Num(0)) {
+        while (gValue.get.value != Left(0)) {
           apply(store)(guard) match {
             case Success(Cell.NULL) => return Success(Cell.NULL)
             case Success(v)         =>  apply(store)(body)
@@ -111,7 +111,7 @@ object behaviors {
   val result: Value = Cell.NULL
 
   def execute(store: Store)(e: Seq[_]): Cell = {
-    result.set(Num(0))
+    result.set(Left(0))
     if(e.nonEmpty) {
       for (exp <- e) {
         result.set(Try(evaluate(store)(exp.asInstanceOf[Expr])).get.get.value)
@@ -139,8 +139,9 @@ object behaviors {
     case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix )(l),
       toFormattedString(prefix)(r), toFormattedString(prefix )(x))
     case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix)(l), toFormattedString(prefix )(r))
-    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix)(l.asInstanceOf[Expr]), toFormattedString(prefix)(r))
+    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix)(l), toFormattedString(prefix)(r))
     case Struct(m) => buildStructExprString(prefix, toFormattedStrings2(prefix)(m))
+    case Select(l, r) => buildExprString(prefix, "Select", toFormattedString(prefix)(l), toFormattedStrings(prefix)(r))
   }
 
 
@@ -167,9 +168,9 @@ object behaviors {
     val result = new StringBuilder(prefix)
     if (e.nonEmpty) {
       for ((k,v) <- e) {
-        result.append(toFormattedString(prefix)(k.asInstanceOf[Expr]))
-        result.append(" : ")
-        result.append(toFormattedString(prefix)(v.asInstanceOf[Expr]))
+       // result.append(k.asInstanceOf[Expr])
+        //result.append(" : ")
+        result.append(v.asInstanceOf[Expr])
         result.append(EOL)
       }
     }
