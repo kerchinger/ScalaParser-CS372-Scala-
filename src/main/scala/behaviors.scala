@@ -1,7 +1,7 @@
 package edu.luc.cs.laufer.cs473.expressions
 
 import edu.luc.cs.laufer.cs473.expressions.ast._
-import edu.luc.cs.laufer.cs473.expressions.evaluate.{Cell, Num}
+import edu.luc.cs.laufer.cs473.expressions.evaluate.{Cell}
 
 import scala.collection.mutable.Map
 import scala.util.{Failure, Success, Try}
@@ -92,10 +92,10 @@ object evaluate {
         Success(Cell.NULL)
       }
     { doLoop }
-/*
-    case Struct(fields @ _*) =>
+
+   /* case Struct(fields @ _*) =>
       // create an object based on the list of field names in the clazz
-      Cell(Right(Map(fields.map(field => (field, Cell(0))): _*)))
+      Success(Cell(Right(Map(fields.map(field => (field, Cell(0))): _*)))
 
     case Select(record, field) => {
       // assume the expression evaluates to a record (.right)
@@ -168,8 +168,8 @@ object behaviors {
     val result = new StringBuilder(prefix)
     if (e.nonEmpty) {
       for ((k,v) <- e) {
-       // result.append(k.asInstanceOf[Expr])
-        //result.append(" : ")
+        result.append(k.asInstanceOf[Expr])
+        result.append(" : ")
         result.append(v.asInstanceOf[Expr])
         result.append(EOL)
       }

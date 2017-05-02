@@ -46,6 +46,6 @@ case class Loop(guard: Expr, body: Expr) extends Expr
 //case class Assign(left: Expr, right: Expr) extends Expr
 case class Assign(left: Expr, right: Expr) extends Expr
 
-case class Struct(fields: Map[Variable,Expr]) extends Expr
+case class Struct(fields: Map[String,Expr]) extends Expr
 
 case class Select(expr: Expr, fieldSelector: List[Variable]) extends Expr

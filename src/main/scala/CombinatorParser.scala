@@ -65,18 +65,13 @@ object CombinatorParser extends JavaTokenParsers {
   /** block ::= "{" statement* "}" */
   def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) }
 
-  def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => Struct(Map(Variable(i) -> e)) }
+  def field: Parser[(String, Expr)] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => i -> e }
 
   /** struct ::= "{" "}" | "{" field { "," field }* "}" */
   def struct: Parser[Expr] = (
         "{" ~ "}" ^^ { case _ ~ _ =>  Struct(Map() ) }
-          | "{" ~> rep1sep(field, ",")  <~ "}" ^^ { case f => Struct(f.map(s => (Variable(s.toString()),s)).toMap) }    )
-
+          | "{" ~> rep1sep(field, ",")  <~ "}" ^^ { case f => Struct(Map(f:_*))})
 }
-
-
-
-
 
 
 //factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
