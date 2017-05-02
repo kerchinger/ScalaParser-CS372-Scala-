@@ -1,7 +1,6 @@
 package edu.luc.cs.laufer.cs473.expressions.ast
 
 import scala.language.postfixOps
-import scala.collection.immutable.Map
 
 /** An initial algebra of arithmetic expressions. */
 sealed trait Expr
@@ -46,8 +45,6 @@ case class Loop(guard: Expr, body: Expr) extends Expr
 
 //case class Assign(left: Expr, right: Expr) extends Expr
 case class Assign(left: Seq[Expr], right: Expr) extends Expr
-
-//case class Field(left: String, right: Expr) extends Expr
 
 case class Struct(fields: Map[Variable,Expr]) extends Expr
 

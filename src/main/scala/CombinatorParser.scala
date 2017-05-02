@@ -5,6 +5,7 @@ import edu.luc.cs.laufer.cs473.expressions.ast._
 import scala.language.postfixOps
 import scala.util.parsing.combinator.JavaTokenParsers
 
+
 object CombinatorParser extends JavaTokenParsers {
 
 
@@ -33,9 +34,13 @@ object CombinatorParser extends JavaTokenParsers {
       | "-" ~> factor ^^ { case e => UMinus(e) }
       | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
       | ident ^^ { case f => Variable(f) }
-      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
       | struct
     )
+
+  /** factor       ::= simplefactor { "." ident }*    */
+  //      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
+  //def factor2: Parser[Expr] =
+
 
   /** statement ::= expression ";" | assignment | conditional | loop | block */
   def statement: Parser[Expr] = (
@@ -47,8 +52,10 @@ object CombinatorParser extends JavaTokenParsers {
     )
 
   /** assignment ::= idenidentt "=" expression ";" */
+  def assignment: Parser[Expr] =  rep1sep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.map(Variable), r) }
   //assignment  ::= ident { "." ident }* "=" expression ";"
-  def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
+  //def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
+  //def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s.asInstanceOf[Seq[Expr]], r) }
 
 
   /** conditional ::= "if" "(" expression ")" block [ "else" block ] */
@@ -59,8 +66,7 @@ object CombinatorParser extends JavaTokenParsers {
 
   /** field  ::= ident ":" expr */
   //(i, e).asInstanceOf[Expr]
-  def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => (i, e).asInstanceOf[Expr] }
-  //TODO idk if correct - needs to refer to the composite struct I believe
+
 
 
   /** loop ::= "while" "(" expression ")" block */
@@ -69,12 +75,16 @@ object CombinatorParser extends JavaTokenParsers {
   /** block ::= "{" statement* "}" */
   def block: Parser[Expr] = "{" ~> (statement *) <~ "}" ^^ { case s => Block(s: _*) }
 
+  def field: Parser[Expr] = ident ~ ":" ~ expr ^^ { case i ~ _ ~ e => Struct(Map(Variable(i) -> e)) }
+  //TODO idk if correct - needs to refer to the composite struct I believe
+
   /** struct ::= "{" "}" | "{" field { "," field }* "}" */
   def struct: Parser[Expr] = (
-    "{" ~ ident ~ "}" ^^ { case i => Variable(i.toString()) }
-      | "{" ~> field ~ rep(field <~ ",") <~ "}" ^^ { case (f: Seq[(Variable, Expr)]) => Struct(f.toMap) } //TODO idk if correct
-    )
-
+        "{" ~ "}" ^^ { case _ ~ _ =>  Struct(Map() ) }
+          | "{" ~> rep1sep(field, ",")  <~ "}" ^^ { case f => Struct(f.map(s => (Variable(s.toString()),s)).toMap) }    )
+  //Struct(Map(null.asInstanceOf[Variable] -> null.asInstanceOf[Expr]))   :Map[Variable,Expr]  => f map { case (key, value) => Struct(key:_*) }
+//f.foldRight(f.head)((_, b) => b)
+  //::f
 }
 
 

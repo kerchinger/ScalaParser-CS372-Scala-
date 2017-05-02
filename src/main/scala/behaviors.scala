@@ -138,10 +138,10 @@ object behaviors {
     case b: Block => buildBlockExprString(prefix, toFormattedStrings(prefix )(b.statements ))
     case Cond(l, r, x) => buildCondExprString(prefix, toFormattedString(prefix )(l),
       toFormattedString(prefix)(r), toFormattedString(prefix )(x))
-    case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix )(l), toFormattedString(prefix )(r))
-    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix )(l.asInstanceOf[Expr]), toFormattedString(prefix )(r))
+    case Loop(l, r) => buildLoopExprString(prefix, toFormattedString(prefix)(l), toFormattedString(prefix )(r))
+    case Assign(l, r) => buildExprString(prefix, "Assign", toFormattedString(prefix)(l.asInstanceOf[Expr]), toFormattedString(prefix)(r))
+    case Struct(m) => buildStructExprString(prefix, toFormattedStrings2(prefix)(m))
   }
-
 
 
   def toFormattedString(e: Seq[Expr]): String = toFormattedStrings("")(e)
@@ -151,7 +151,6 @@ object behaviors {
   def toPrettyFormattedString(e: Expr): String = toFormattedString("")(e)
 
   def toPrettyFormattedString(e: Seq[Expr]): String = toFormattedStrings("")(e)
-
 
   def toFormattedStrings(prefix: String)(e: Seq[_]): String = {
     val result = new StringBuilder(prefix)
@@ -163,6 +162,20 @@ object behaviors {
     }
     result.toString()
   }
+
+  def toFormattedStrings2(prefix: String)(e: collection.Map[Variable,Expr]): String = {
+    val result = new StringBuilder(prefix)
+    if (e.nonEmpty) {
+      for ((k,v) <- e) {
+        result.append(toFormattedString(prefix)(k.asInstanceOf[Expr]))
+        result.append(" : ")
+        result.append(toFormattedString(prefix)(v.asInstanceOf[Expr]))
+        result.append(EOL)
+      }
+    }
+    result.toString()
+  }
+
 
   def buildExprString(prefix: String, nodeString: String, leftString: String, rightString: String) = {
     val result = new StringBuilder(prefix)
@@ -217,6 +230,18 @@ object behaviors {
     if (elseBlock.trim.length > 0) {
       result.append(" else ")
       result.append(elseBlock)
+    }
+    result.toString()
+  }
+
+  def buildStructExprString(prefix: String, m: String) = {
+    val result = new StringBuilder(prefix)
+    if (m.trim.length > 0) {
+      result.append("{")
+      result.append(EOL)
+      result.append(m.lines.map(a => INDENT + a).mkString(EOL))
+      result.append(EOL)
+      result.append("}")
     }
     result.toString()
   }
