@@ -29,12 +29,13 @@ object CombinatorParser extends JavaTokenParsers {
   /** factor ::= wholeNumber | "+" factor | "-" factor | "(" expr ")" | ident */
   //factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
   def factor: Parser[Expr] = (
-    wholeNumber ^^ { case s => Constant(s.toInt) }
+    ident ~ rep("." ~> ident) ^^ { case f ~ f2 => Select(Variable(f), f2.map(Variable)) }
+    //rep1sep(ident, ".") ^^ { case f => f.map(Variable).asInstanceOf[Expr]}
+      | wholeNumber ^^ { case s => Constant(s.toInt) }
       | "+" ~> factor ^^ { case e => e }
       | "-" ~> factor ^^ { case e => UMinus(e) }
       | "(" ~ expr ~ ")" ^^ { case _ ~ e ~ _ => e }
-      | ident ^^ { case f => Variable(f) }
-      | struct
+      | struct ^^ {case f => f}
     )
 
   /** factor       ::= simplefactor { "." ident }*    */
@@ -52,7 +53,7 @@ object CombinatorParser extends JavaTokenParsers {
     )
 
   /** assignment ::= idenidentt "=" expression ";" */
-  def assignment: Parser[Expr] =  rep1sep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.map(Variable), r) }
+  def assignment: Parser[Expr] =  ident ~ rep("." ~> ident) ~ "=" ~ expr ~ ";" ^^ { case x ~ t ~ _ ~ r ~ _ => Assign(Select(Variable(x),t.map(Variable)), r) }
   //assignment  ::= ident { "." ident }* "=" expression ";"
   //def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
   //def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s.asInstanceOf[Seq[Expr]], r) }
