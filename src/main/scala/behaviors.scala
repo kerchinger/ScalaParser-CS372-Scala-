@@ -164,11 +164,11 @@ object behaviors {
     result.toString()
   }
 
-  def toFormattedStrings2(prefix: String)(e: collection.Map[Variable,Expr]): String = {
+  def toFormattedStrings2(prefix: String)(e: collection.Map[String,Expr]): String = {
     val result = new StringBuilder(prefix)
     if (e.nonEmpty) {
       for ((k,v) <- e) {
-        result.append(k.asInstanceOf[Expr])
+        result.append(k)
         result.append(" : ")
         result.append(v.asInstanceOf[Expr])
         result.append(EOL)

@@ -17,11 +17,11 @@ object PrettyPrinter extends JavaTokenParsers {
     }
     result.toString()
   }
-  def toFormattedStrings2(e: collection.Map[Variable,Expr]): String = {
+  def toFormattedStrings2(e: collection.Map[String,Expr]): String = {
     val result = new StringBuilder
     if (e.nonEmpty) {
       for ((k,v) <- e) {
-        result.append(toFormattedString(k.asInstanceOf[Expr]))
+        result.append(k)
         result.append(" : ")
         result.append(toFormattedString(v.asInstanceOf[Expr]))
         result.append(EOL)
