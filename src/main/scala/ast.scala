@@ -48,4 +48,4 @@ case class Assign(left: Expr, right: Expr) extends Expr
 
 case class Struct(fields: Map[String,Expr]) extends Expr
 
-case class Select(expr: Expr, fieldSelector: List[Variable]) extends Expr
+case class Select(expr: Expr, fieldSelector: List[Expr]) extends Expr

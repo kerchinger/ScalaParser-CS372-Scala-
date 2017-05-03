@@ -1,7 +1,7 @@
 package edu.luc.cs.laufer.cs473.expressions
 
 import edu.luc.cs.laufer.cs473.expressions.ast._
-import edu.luc.cs.laufer.cs473.expressions.evaluate.{Cell}
+import edu.luc.cs.laufer.cs473.expressions.evaluate.Cell
 
 import scala.collection.mutable.Map
 import scala.util.{Failure, Success, Try}
@@ -11,11 +11,13 @@ object evaluate {
 
   case class Cell(var value: Value) {
     def get: Value = value
+
     def set(value: Value): Unit = this.value = value
   }
 
   object Cell {
     def apply(i: Int): Cell = Cell(Left(i))
+    def apply(i: List[Expr]) = 0
     val NULL = Cell(0)
   }
 
@@ -36,74 +38,111 @@ object evaluate {
 
   //case class Num(value: Int)  extends Value
 
-  def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Result ={
-    for { Cell(Left(l)) <- apply(store)(left); Cell(Left(r)) <- apply(store)(right) } yield Cell(Left(op(l, r)))
+  def binOp(store: Store, left: Expr, right: Expr, op: (Int, Int) => Int): Result = {
+    for {Cell(Left(l)) <- apply(store)(left); Cell(Left(r)) <- apply(store)(right)} yield Cell(Left(op(l, r)))
   }
 
   def apply(store: Store)(s: Expr): Result = s match {
-    case Constant(value)    =>  { Success(Cell(value)) }
-    case Plus(left, right)  =>   binOp(store, left, right, _ + _)
-    case Minus(left, right) =>  { binOp(store, left, right, _ - _) }
-    case Times(left, right) =>  { binOp(store,left, right, _ * _) }
-    case Div(left, right)   =>  { binOp(store,left, right, _ / _) }
-    case Mod(left, right)   =>  { binOp(store,left, right, _ % _) }
-    case UMinus(expr)       =>  {  for { Cell(Left(e)) <- apply(store)(expr) } yield Cell(Left(-e)) }
-    case Variable(name)     =>  { lookup(store)(name) }
+    case Constant(value) => {
+      Success(Cell(value))
+    }
+    case Plus(left, right) => binOp(store, left, right, _ + _)
+    case Minus(left, right) => {
+      binOp(store, left, right, _ - _)
+    }
+    case Times(left, right) => {
+      binOp(store, left, right, _ * _)
+    }
+    case Div(left, right) => {
+      binOp(store, left, right, _ / _)
+    }
+    case Mod(left, right) => {
+      binOp(store, left, right, _ % _)
+    }
+    case UMinus(expr) => {
+      for {Cell(Left(e)) <- apply(store)(expr)} yield Cell(Left(-e))
+    }
+    case Variable(name) => {
+      lookup(store)(name)
+    }
 
     case Assign(left, right) =>
       val rValue = apply(store)(right)
-      if (store contains left.asInstanceOf[Variable].toString){
-        val lValue = apply(store)(left.asInstanceOf[Expr])
+
+      if (store.contains(left.asInstanceOf[Select].toString)) {
+        val lValue = apply(store)(left)
         lValue.get.set(rValue.get.get)
       }
-      else {store.put(left.asInstanceOf[Variable].name, rValue.get)}
+      else {
+        store.put(PrettyPrinter.toFormattedString(left), rValue.get)
+      }
       Success(Cell.NULL)
 
-    case Cond(guard, thenBranch, elseBranch) =>  {
+    case Cond(guard, thenBranch, elseBranch) => {
       apply(store)(guard) match {
         case Success(Cell.NULL) => apply(store)(elseBranch)
-        case Success(_)         => apply(store)(thenBranch)
-        case f @ Failure(_)     => f
+        case Success(_) => apply(store)(thenBranch)
+        case f@Failure(_) => f
       }
     }
-    case Block(expressions @_*) =>
+    case Block(expressions@_*) =>
       def doSequence: Result = {
         val i = expressions.iterator
         var result: Cell = Cell.NULL
         while (i.hasNext) {
           apply(store)(i.next()) match {
-            case Success(r)     => result = r
-            case f @ Failure(_) => return f
+            case Success(r) => result = r
+            case f@Failure(_) => return f
           }
         }
         Success(result)
       }
-    { doSequence }
+    {
+      doSequence
+    }
     case Loop(guard, body) =>
       def doLoop: Result = {
         var gValue = apply(store)(guard)
         while (gValue.get.value != Left(0)) {
           apply(store)(guard) match {
             case Success(Cell.NULL) => return Success(Cell.NULL)
-            case Success(v)         =>  apply(store)(body)
-            case f @ Failure(_)     => return f
+            case Success(v) => apply(store)(body)
+            case f@Failure(_) => return f
           }
         }
         Success(Cell.NULL)
       }
-    { doLoop }
+    {
+      doLoop
+    }
 
-   /* case Struct(fields @ _*) =>
+    case Struct(fields ) => // to evaluate struct make recursive call to apply, return Map
       // create an object based on the list of field names in the clazz
-      Success(Cell(Right(Map(fields.map(field => (field, Cell(0))): _*)))
+     //Cell(Right((fields.map(field => (field, Cell(0))): _*))*/
+      //Cell(Right(fields.map(f => (String, Expr)):_*))
+      //Cell(Right(fields.map(f => (String,Cell(0))):_*))
+      Success(Cell.NULL)
 
     case Select(record, field) => {
       // assume the expression evaluates to a record (.right)
-      // and choose the desired field
-      apply(store)(record).get.right.get.apply(field)
-    }*/
-  }
-}
+      // and choose the desired field .get.get.right.get.apply(fields)
+      //apply(store)(record).get.right.get.apply(field)
+      //apply(store)(record) //.get.get.right.get.apply(field.head.toString)
+     // println("hi" + PrettyPrinter.toFormattedString(Select(record, field)))
+      //apply(store)(record).get.get.right.get.apply(PrettyPrinter.toFormattedString(Select(record, field)))
+      apply(store)(Select(record,field)).get.get.right.get.apply(???)
+      /*val i = field.iterato
+      var result: Cell = Cell.NULL
+      while (i.hasNext) {
+        println("HI" )
+        apply(store)((record -> field).asInstanceOf[Expr])//.get.get.right.get.apply(i.next().toString)
+        }
+      Success(Cell.NULL)
+      }*/
+      Success(Cell.NULL)
+    }
+}}
+
 object behaviors {
 
   type Value = Cell
