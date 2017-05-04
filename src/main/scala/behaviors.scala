@@ -74,7 +74,10 @@ object evaluate {
         lValue.get.set(rValue.get.get)
       }
       else {
-        store.put(PrettyPrinter.toFormattedString(left), rValue.get)
+        store.put(PrettyPrinter.toFormattedString(left), rValue.get) // PrettyPrinter should not be here
+
+        //store.put(apply(store)(left.asInstanceOf[Select].expr).toString + apply(store)(left.asInstanceOf[Select]).toString, rValue.get)
+       // store.getOrElseUpdate(left.toString, rValue.get)
       }
       Success(Cell.NULL)
 
@@ -116,32 +119,27 @@ object evaluate {
       doLoop
     }
 
-    case Struct(fields ) => // to evaluate struct make recursive call to apply, return Map
-      // create an object based on the list of field names in the clazz
-     //Cell(Right((fields.map(field => (field, Cell(0))): _*))*/
-      //Cell(Right(fields.map(f => (String, Expr)):_*))
-      //Cell(Right(fields.map(f => (String,Cell(0))):_*))
-      Success(Cell.NULL)
+    case Struct(fields ) =>
+      // Cell(Right(Map(fields.map(field => (field, Cell(0))): _*)))
+
+    val i = fields.iterator
+      while(i.hasNext){
+        //apply(store)((Map(i.next()._1 -> i.next()._2).asInstanceOf[Expr]))
+          //i.next()._1 -> i.next()._2.asInstanceOf[Expr])
+        Map(i.next()._1 -> apply(store)(i.next().asInstanceOf[Expr]))
+      }
+       Success(Cell.NULL)
 
     case Select(record, field) => {
-      // assume the expression evaluates to a record (.right)
-      // and choose the desired field .get.get.right.get.apply(fields)
-      //apply(store)(record).get.right.get.apply(field)
-      //apply(store)(record) //.get.get.right.get.apply(field.head.toString)
-     // println("hi" + PrettyPrinter.toFormattedString(Select(record, field)))
-      //apply(store)(record).get.get.right.get.apply(PrettyPrinter.toFormattedString(Select(record, field)))
-      apply(store)(Select(record,field)).get.get.right.get.apply(???)
-      /*val i = field.iterato
+      val i = field.iterator
       var result: Cell = Cell.NULL
       while (i.hasNext) {
-        println("HI" )
-        apply(store)((record -> field).asInstanceOf[Expr])//.get.get.right.get.apply(i.next().toString)
+        apply(store)(record).get.get.right.get.apply(i.next().toString)
         }
       Success(Cell.NULL)
-      }*/
-      Success(Cell.NULL)
     }
-}}
+  }
+}
 
 object behaviors {
 

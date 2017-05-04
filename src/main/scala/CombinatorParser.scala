@@ -74,22 +74,3 @@ object CombinatorParser extends JavaTokenParsers {
 }
 
 
-//factor ::= ident { "." ident }* | number | "+" factor | "-" factor | "(" expr ")" | struct
-//ident ~ rep("." ~> ident) ^^ { case f ~ f2 => Select(Variable(f), f2.map(Variable)) }
-//rep1sep(ident, ".") ^^ { case f => f.map(Variable).asInstanceOf[Expr]}
-
-/** factor       ::= simplefactor { "." ident }*    */
-//      | ident ~ rep(ident <~ ".") ^^ { case f ~ f2 => Select(Variable(f), f2.asInstanceOf[Variable]) }
-//def factor2: Parser[Expr] =
-
-//assignment  ::= ident { "." ident }* "=" expression ";"
-//def assignment: Parser[Expr] = repsep(ident, ".") ~ "=" ~ expr ~ ";" ^^ { case t ~ _ ~ r ~ _ => Assign(t.asInstanceOf[Seq[Expr]], r) }
-//def assignment: Parser[Expr] = ident ~ "=" ~ expr ~ ";" ^^ { case s ~ _ ~ r ~ _ => Assign(s.asInstanceOf[Seq[Expr]], r) }
-
-//Struct(Map(null.asInstanceOf[Variable] -> null.asInstanceOf[Expr]))   :Map[Variable,Expr]  => f map { case (key, value) => Struct(key:_*) }
-//f.foldRight(f.head)((_, b) => b)
-//::f
-
-/** field  ::= ident ":" expr */
-//(i, e).asInstanceOf[Expr]
-
